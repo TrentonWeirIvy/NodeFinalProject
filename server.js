@@ -28,20 +28,38 @@ app.use((req, res, next) => {
   next();
 });
 
+class Teacher {
+    constructor(obj){
+        this.id = obj.id ?? undefined;
+        this.name = obj.name ?? undefined;
+    }
+}
+class Course {
+    constructor(obj){
+        this.id = obj.id ?? undefined;
+        this.name = obj.name ?? undefined;
+        this.teacher = obj.teacher ?? new Teacher({});
+    }
+}
+ 
 
 //data 
-var courses = Array.from({length:10}, (_,index) =>{
-    return {
-        name: `Course: ${index}`,
-        teacher: `Teacher Name: ${index}`
-    }
-} );
+
 
 var teachers = Array.from({length:10}, (_,index)=>{
-    return {
-        name: `Teacher Name: ${index}`
-    }
-})
+    return new Teacher({
+        id: index,
+        name: `Teacher Name ${index}`
+    })
+});
+var courses = Array.from({length:10}, (_,index) =>{
+    console.log(teachers[index])
+    return new Course({
+        id: index,
+        name: `Course ${index}`,
+        teacher: teachers[index]
+    });
+} );
 
 
 ///- api
@@ -106,6 +124,10 @@ app.get('/teachers', (req, res) => {
 
 // ...
 
+app.get('/courses', (req,res) => {
+    res.render('courses', { title: 'Index', courses:courses });
+});
+
 app.get('/courseForm', (req, res) => {
     // Assuming you have a way to retrieve a course, replace this with your actual logic
     const course = {
@@ -123,6 +145,21 @@ app.get('/courseForm', (req, res) => {
         course,
         buttonLabel: 'Submit'
     });
+});
+
+app.get('/courseForm/:id', (req,res) => {
+    const course = courses.find(c => c.id == req.params.id) ?? new Course({});
+
+    res.render('courseForm', {
+        title: 'Course Form',
+        pageTitle: 'Course Form',
+        formAction: '/courses',
+        teachers,
+        courses,
+        course,
+        buttonLabel: 'Submit'
+    });
+    
 });
 
 // ...

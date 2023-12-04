@@ -9,22 +9,6 @@
     <h2>Welcome to Trenton Weir's Website</h2>
 
     <section class="courses">
-      <table class="teacher-table" id="teachersTable">
-        <thead>
-          <tr>
-            <th>Id</th>
-            <th>Name</th>
-          </tr>
-        </thead>
-        <tbody>
-          <% teachers.forEach(teacher => { %>
-          <tr class="teacher-row" data-id="<%= teacher.id %>">
-            <td><%= teacher.id %></td>
-            <td><%= teacher.name %></td>
-          </tr>
-          <% }); %>
-        </tbody>
-      </table>
       <table class="teacher-table" id="coursesTable">
         <thead>
           <tr>
