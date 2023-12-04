@@ -90,30 +90,41 @@ body, h1, h2, h3, p, ul, li {
   .button:hover {
     background-color: #0056b3; /* Button hover color */
   }
+
   
   /* ... (existing styles) */
 
+/* Teacher table styles */
 /* Teacher table styles */
 .teacher-table {
     width: 100%;
     border-collapse: collapse;
     margin-top: 20px;
-  }
-  
-  .teacher-table th, .teacher-table td {
+}
+
+.teacher-table th, .teacher-table td {
     padding: 10px;
     text-align: left;
     border: 1px solid #ccc;
-  }
-  
-  .teacher-table th {
+}
+
+.teacher-table th {
     background-color: #58a6ff; /* Header background color */
     color: #fff; /* Header text color */
-  }
-  
-  .teacher-table tbody tr:nth-child(even) {
+}
+
+.teacher-table tbody tr:nth-child(even) {
     background-color: #404040; /* Alternate row background color */
-  }
+}
+
+.teacher-table tbody tr:hover {
+    background-color: #0056b3;
+}
+
+.teacher-table tbody tr:nth-child(even):hover {
+    background-color: #0056b3;
+}
+
 
   /* ... (existing styles) */
 

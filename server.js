@@ -30,18 +30,61 @@ app.use((req, res, next) => {
 
 
 //data 
-const courses = Array.from({length:10}, (_,index) =>{
+var courses = Array.from({length:10}, (_,index) =>{
     return {
         name: `Course: ${index}`,
         teacher: `Teacher Name: ${index}`
     }
 } );
 
-const teachers = Array.from({length:10}, (_,index)=>{
+var teachers = Array.from({length:10}, (_,index)=>{
     return {
         name: `Teacher Name: ${index}`
     }
 })
+
+
+///- api
+app.get('/api/teachers', (req,res)=>{
+    res.json(teachers);
+});
+app.get('/api/teachers/:id', (req,res)=>{
+    const id = req.params.id;
+    res.json(teachers.at(id));
+});
+app.post('/api/teacher/:id', (req,res)=>{
+    const id = req.params.id;
+});
+app.put('/api/teacher/:id', (req,res)=>{
+    const id = req.params.id;
+});
+app.delete('/api/teacher/:id', (req,res)=>{
+    const id = req.params.id;
+});
+
+
+app.get('/api/courses',(req,res)=>{
+    res.json(courses);
+});
+app.get('/api/courses/:id',(req,res)=>{
+    res.json(courses.at(req.params.id));
+});
+app.post('/api/courses/:course',(req,res)=>{
+    const course = JSON.parse(req.params.course);
+    courses.push(course);
+    res.json(courses);
+});
+app.put('/api/courses/:course/:id',(req,res)=>{
+    const id = req.params.id;
+    const course = req.params.course;
+    course.at(id) = JSON.parse(course);
+    res.json(courses);
+});
+app.delete('/api/courses/:id',(req,res)=>{
+    courses = courses.filter((course,index) => index !== req.params.id);
+    res.json(courses);
+});
+///- end api
 
 
 
