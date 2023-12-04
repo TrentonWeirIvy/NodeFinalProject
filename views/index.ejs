@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<%- include("./partials/head.ejs") %>
+
+<body>
+  <%- include("./partials/nav.ejs") %>
+
+  <div class="container">
+    <h2>Welcome to Trenton Weir's Website</h2>
+
+    <section class="courses">
+        <table class="teacher-table">
+            <thead>
+              <tr>
+                <th>Name</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% teachers.forEach(teacher => { %>
+                <tr>
+                  <td><%= teacher.name %></td>
+                </tr>
+              <% }); %>
+            </tbody>
+          </table>
+          <table class="teacher-table">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Teacher</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% courses.forEach(c => { %>
+                <tr>
+                  <td><%= c.name %></td>
+                  <td><%= c.teacher %></td>
+                </tr>
+              <% }); %>
+            </tbody>
+          </table>
+
+    </section>
+  </div>
+
+  <%- include("./partials/footer.ejs") %>
+</body>
+</html>

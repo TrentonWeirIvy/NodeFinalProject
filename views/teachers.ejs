@@ -1,0 +1,29 @@
+<html lang="en">
+<%- include("./partials/head.ejs") %>
+
+<body>
+  <%- include("./partials/nav.ejs") %>
+
+  <div class="content container">
+    <h2>Teachers</h2>
+
+    <!-- Display list of teachers in a table -->
+    <table class="teacher-table">
+      <thead>
+        <tr>
+          <th>Name</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% teachers.forEach(teacher => { %>
+          <tr>
+            <td><%= teacher.name %></td>
+          </tr>
+        <% }); %>
+      </tbody>
+    </table>
+  </div>
+
+  <%- include("./partials/footer.ejs") %>
+</body>
+</html>

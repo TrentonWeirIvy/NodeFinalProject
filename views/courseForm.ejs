@@ -1,0 +1,28 @@
+<html lang="en">
+<%- include("./partials/head.ejs") %>
+
+<body>
+  <%- include("./partials/nav.ejs") %>
+
+  <div class="content container">
+    <h2><%= pageTitle %></h2>
+
+    <!-- Course Form -->
+    <form action="<%= formAction %>" method="POST">
+      <label for="courseName">Course Name:</label>
+      <input type="text" id="courseName" name="courseName" value="<%= course ? course.name : '' %>" required>
+
+      <label for="teacher">Teacher:</label>
+      <select id="teacher" name="teacher" required>
+        <% teachers.forEach(teacher => { %>
+          <option value="<%= teacher.name %>" <%= course && course.teacher === teacher.name ? 'selected' : '' %>><%= teacher.name %></option>
+        <% }); %>
+      </select>
+
+      <button type="submit"><%= buttonLabel %></button>
+    </form>
+  </div>
+
+  <%- include("./partials/footer.ejs") %>
+</body>
+</html>

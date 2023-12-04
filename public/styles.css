@@ -1,0 +1,133 @@
+/* Reset some default styles for consistency */
+body, h1, h2, h3, p, ul, li {
+    margin: 0;
+    padding: 0;
+  }
+  
+  /* Set up Roboto font from Google Fonts */
+  @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
+  
+  /* Apply Roboto font to the entire body */
+  body {
+    font-family: 'Roboto', sans-serif;
+    background-color: #1a1a1a; /* Dark background color */
+    color: #e0e0e0; /* Light text color */
+  }
+  
+  /* Navbar styles */
+  .navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #333; /* Navbar background color */
+    padding: 10px 20px;
+  }
+  
+  .site-title h1 {
+    color: #58a6ff; /* Heading color */
+  }
+  
+  .site-title p {
+    color: #8b949e; /* Subtitle color */
+  }
+  
+  .nav-links {
+    list-style: none;
+    display: flex;
+  }
+  
+  .nav-links li {
+    margin-right: 20px;
+  }
+  
+  .nav-links a {
+    text-decoration: none;
+    color: #c9d1d9; /* Link color */
+    transition: color 0.3s ease-in-out;
+  }
+  
+  .nav-links a:hover {
+    color: #58a6ff; /* Hover color */
+  }
+  
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+  }
+  
+  h1, h2, h3 {
+    color: #58a6ff; /* Heading color */
+  }
+  
+  p {
+    color: #8b949e; /* Text color */
+    line-height: 1.6;
+  }
+  
+  a {
+    color: #58a6ff; /* Link color */
+    text-decoration: none;
+  }
+  
+  a:hover {
+    text-decoration: underline;
+  }
+  
+  /* Button styles */
+  .button {
+    display: inline-block;
+    padding: 10px 20px;
+    margin-top: 20px;
+    background-color: #58a6ff; /* Button color */
+    color: #fff; /* Button text color */
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease-in-out;
+  }
+  
+  .button:hover {
+    background-color: #0056b3; /* Button hover color */
+  }
+  
+  /* ... (existing styles) */
+
+/* Teacher table styles */
+.teacher-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+  }
+  
+  .teacher-table th, .teacher-table td {
+    padding: 10px;
+    text-align: left;
+    border: 1px solid #ccc;
+  }
+  
+  .teacher-table th {
+    background-color: #58a6ff; /* Header background color */
+    color: #fff; /* Header text color */
+  }
+  
+  .teacher-table tbody tr:nth-child(even) {
+    background-color: #404040; /* Alternate row background color */
+  }
+
+  /* ... (existing styles) */
+
+/* Footer styles */
+footer {
+    background-color: #1a1a1a; /* Footer background color */
+    color: #e0e0e0; /* Footer text color */
+    padding: 20px 0;
+    text-align: center;
+  }
+  
+  /* Responsive container for the footer */
+  footer .container {
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  
