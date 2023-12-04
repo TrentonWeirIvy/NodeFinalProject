@@ -70,8 +70,17 @@ app.get('/api/teachers/:id', (req,res)=>{
     const id = req.params.id;
     res.json(teachers.at(id));
 });
-app.post('/api/teacher/:id', (req,res)=>{
-    const id = req.params.id;
+app.post('/api/teacher/:name', (req,res)=>{
+    const teach = JSON.parse(req.params.name);
+    const name = teach.name;
+    console.log(teach);
+    if(!teachers.includes(name)){
+        let id = teachers.length;
+        teachers.push(new Teacher({
+            id,name
+        }));
+        res.json(teachers.at(id));
+    }
 });
 app.put('/api/teacher/:id', (req,res)=>{
     const id = req.params.id;
@@ -115,11 +124,24 @@ app.get('/index', (req, res) => {
     res.render('index', { title: 'Index',teachers:teachers, courses:courses });
 });
 
+app.get('/teacherForm', (req, res) => {
+    const teacher = new Teacher({});
+    res.render('teacherForm', 
+    {
+        pageTitle: 'Create Teacher',
+        title:'Teachers',
+        formAction:'/teachers', 
+        teachers: teachers, 
+        teacher: teacher,
+        buttonLabel: 'Create New Teacher'
+    });
+})
+
 app.get('/teachers', (req, res) => {
     // Assuming teachersData is an array of teachers retrieved from your database
 
 
-    res.render('teachers', { title: 'Teachers', teachers: teachers });
+    res.render('teachers', { title: 'Teachers',  teachers: teachers });
 });
 
 // ...
