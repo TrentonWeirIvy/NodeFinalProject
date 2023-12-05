@@ -5,24 +5,61 @@
   <%- include("./partials/nav.ejs") %>
 
   <div class="content container">
-    <h2><%= pageTitle %></h2>
+    <h2 class="modern-title"><%= pageTitle %></h2>
 
     <!-- Course Form -->
-    <form action="<%= formAction %>" method="POST">
-      <label for="courseName">Course Name:</label>
-      <input type="text" id="courseName" name="courseName" value="<%= course ? course.name : '' %>" required>
+    <form action="<%= formAction %>" method="POST" class="modern-form">
+      <div class="form-group">
+        <label for="courseName" class="modern-label">Course Name:</label>
+        <input data-id="<% course.id %>" type="text" id="courseName" name="courseName" value="<%= course ? course.name : '' %>" class="custom-input" required>
 
-      <label for="teacher">Teacher:</label>
-      <select id="teacher" name="teacher" required>
-        <% teachers.forEach(teacher => { %>
-          <option value="<%= teacher.name %>" <%= course && course.teacher === teacher.name ? 'selected' : '' %>><%= teacher.name %></option>
-        <% }); %>
-      </select>
+      </div>
 
-      <button type="submit"><%= buttonLabel %></button>
+      <div class="form-group">
+        <label for="teacher" class="modern-label">Teacher:</label>
+        <div>
+          <div class="select-wrapper">
+            <select id="teacher" name="teacher" class="select custom-select" required>
+              <% teachers.forEach(teacher => { %>
+                <option value="<%= teacher.name %>" <%= course && course.teacher === teacher.name ? 'selected' : '' %>><%= teacher.name %></option>
+              <% }); %>
+            </select>
+            <div class="select-arrow">&#9660;</div>
+            <div class="select-dropdown">
+              <!-- Dropdown options go here -->
+            </div>
+          </div>
+        </div>
+        
+        
+      </div>
+
+      <button id="submitButton" type="button" class="button modern-button"><%= buttonLabel %></button>
     </form>
   </div>
 
   <%- include("./partials/footer.ejs") %>
+
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+<script>
+  document.querySelector('#submitButton').addEventListener('click', () => {
+
+    const newCourse = {
+      id: document.querySelector('#courseName').getAttribute('data-id'),
+      name: document.querySelector('#courseName').value,
+      teacher: document.querySelector('#teacher').value
+    }
+
+    axios.post(`./api/course/${JSON.stringify(newCourse)}`).then(res => {
+      console.log(res)
+      if (res.status == 200) {
+        alert('Teacher Created, ID: ' + res.data.id)
+      } else {
+        alert("Failed to create " + teacherName)
+      }
+    }).catch(e => alert(e));
+  })
+</script>
 </body>
 </html>

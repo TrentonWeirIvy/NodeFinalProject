@@ -4,17 +4,15 @@
 <body>
   <%- include("./partials/nav.ejs") %>
 
-  <div class="content container">
-    <h2><%= pageTitle %></h2>
+  <div class="container card">
+    <h2 class="card-title modern-title"><%= pageTitle %></h2>
 
     <!-- Course Form -->
-    <form action="<%= formAction %>" method="POST">
-      <label for="teacherName">Teacher Name:</label>
-      <input type="text" id="teacherName" name="courseName" value="<%= teacher ? teacher.name : '' %>" required>
-
-      <button type="submit"><%= buttonLabel %></button>
+    <form action="<%= formAction %>" method="POST" class="card-content modern-form">
+      <label for="teacherName" class="modern-label">Teacher Name:</label>
+      <input type="text" data-id="<% teacher.id ?? null %>" id="teacherName" name="courseName" value="<%= teacher ? teacher.name : '' %>" class="custom-input" required>
+      <button id="submitButton" type="button" class="button modern-button"><%= buttonLabel %></button>
     </form>
-    <button id="submitButton" type="button"><%= buttonLabel %></button>
   </div>
 
   <%- include("./partials/footer.ejs") %>
@@ -23,19 +21,18 @@
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 
 <script>
-    
-    document.querySelector('#submitButton').addEventListener('click', () => {
-        const teacherName = document.querySelector('#teacherName').value;
-        axios.post(`./api/teacher/${JSON.stringify({name:teacherName})}`).then(res => {
-            console.log(res)
-            if(res.status == 200){
-                alert('Teacher Created, ID: ' + res.data.id)
-            }
-            else{
-                alert("Failed to create " + teacherName )
-            }
-
-        }).catch(e => alert(e));
-    })
+  document.querySelector('#submitButton').addEventListener('click', () => {
+    const id = this.getAttribute('data-id');
+    const teacherName = document.querySelector('#teacherName').value;
+    const newTeach = { name: teacherName, id: id };
+    axios.post(`./api/teacher/${JSON.stringify(newTeach)}`).then(res => {
+      console.log(res)
+      if (res.status == 200) {
+        alert('Teacher Created, ID: ' + res.data.id)
+      } else {
+        alert("Failed to create " + teacherName)
+      }
+    }).catch(e => alert(e));
+  })
 </script>
 </html>

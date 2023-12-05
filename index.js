@@ -93,21 +93,22 @@ app.delete('/api/teacher/:id', (req,res)=>{
 app.get('/api/courses',(req,res)=>{
     res.json(courses);
 });
-app.get('/api/courses/:id',(req,res)=>{
+app.get('/api/course/:id',(req,res)=>{
     res.json(courses.at(req.params.id));
 });
-app.post('/api/courses/:course',(req,res)=>{
+app.post('/api/course/:course',(req,res)=>{
     const course = JSON.parse(req.params.course);
-    courses.push(course);
-    res.json(courses);
+    console.log(course);
+    let id = courses.push(course);
+    res.json(id);
 });
-app.put('/api/courses/:course/:id',(req,res)=>{
+app.put('/api/course/:course/:id',(req,res)=>{
     const id = req.params.id;
     const course = req.params.course;
     course.at(id) = JSON.parse(course);
     res.json(courses);
 });
-app.delete('/api/courses/:id',(req,res)=>{
+app.delete('/api/course/:id',(req,res)=>{
     courses = courses.filter((course,index) => index !== req.params.id);
     res.json(courses);
 });
