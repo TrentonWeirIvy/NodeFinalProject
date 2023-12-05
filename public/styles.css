@@ -68,6 +68,18 @@ body {
   margin: 0 auto;
   padding: 20px;
 }
+.container-flex{
+  margin-left: 1em;
+  margin-right: 1em;
+  display: flex;
+  padding:2em;
+}
+
+  .item {
+    display: inline-block; 
+  }
+
+
 
 h1, h2, h3 {
   color: var(--primary-color);
@@ -228,3 +240,56 @@ footer .container {
   max-width: 1200px;
   margin: 0 auto;
 }
+
+/* ... existing styles ... */
+
+.auth-form {
+  max-width: 400px; /* Adjust the maximum width of the form as needed */
+  margin: 0 auto;
+}
+
+.auth-form .container-flex {
+  display: flex;
+  justify-content: space-between;
+}
+
+.auth-form .item {
+  flex: 1; /* Use flex property to distribute space evenly between inputs */
+  margin-right: 10px; /* Add margin between the items */
+}
+
+.auth-form label {
+  display: block;
+  margin-bottom: 5px;
+}
+
+.auth-form input {
+  width: 100%; /* Make the inputs fill the available width */
+}
+
+/* ... existing styles ... */
+
+
+/* Add media queries for responsiveness */
+@media only screen and (max-width: 768px) {
+  .nav-links {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .nav-links li {
+    margin-right: 0;
+    margin-bottom: 10px;
+  }
+
+  .container-flex {
+    flex-direction: column;
+  }
+
+  .item {
+    display: block;
+    margin-bottom: 10px;
+  }
+}
+
+/* Add more media queries as needed */

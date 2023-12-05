@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<%- include("./partials/head.ejs") %>
+<body>
+    <%- include("./partials/nav.ejs") %>
+
+    <div class="container">
+        <div id="signin-form" class="auth-form">
+            <h2><%= title %></h2>
+            <form>
+
+                        <label for="firstname">First Name</label>
+                        <input type="text" id="firstname" name="firstname" class="custom-input" required>
+
+                        <label for="lastname">Last Name</label>
+                        <input type="text" id="lastname" name="lastname" class="custom-input" required>
+       
+                <label for="username">Username:</label>
+                <input type="text" id="username" name="username" class="custom-input" required>
+
+                <label for="password">Password:</label>
+                <input type="password" id="password" name="password" class="custom-input" required>
+
+                <button type="button" class="button">Create User</button>
+            </form>
+        </div>
+    </div>
+
+    <%- include("./partials/footer.ejs") %>
+
+    <script>
+        const signinForm = document.getElementById('signin-form');
+        const inputs = signinForm.querySelectorAll('input');
+        inputs[0].focus();
+        inputs.forEach((input, index) => {
+            input.addEventListener('keydown', (event) => {
+              if (['Enter','ArrowDown'].includes(event.key)) {
+                event.preventDefault();
+                if (index < inputs.length - 1) {
+                  inputs[index + 1].focus();
+                }
+              } else if (event.key === 'ArrowUp') {
+                if (index > 0) {
+                  inputs[index - 1].focus();
+                }
+              }
+            });
+          });
+
+        document.querySelector('.nav-links').addEventListener('click', (event) => {
+            if (event.target.tagName === 'A') {
+                const targetId = event.target.getAttribute('data-target');
+                if (targetId === 'signin') {
+                    signinForm.style.display = 'block';
+                    signupForm.style.display = 'none';
+                } else if (targetId === 'signup') {
+                    signinForm.style.display = 'none';
+                    signupForm.style.display = 'block';
+                }
+            }
+        });
+    </script>
+</body>
+</html>

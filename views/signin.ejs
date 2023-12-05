@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<%- include("./partials/head.ejs") %>
+<body>
+    <%- include("./partials/nav.ejs") %>
+
+    <div class="container">
+        <div id="signin-form" class="auth-form">
+            <h2>Sign In</h2>
+            <form>
+                <label for="username">Username:</label>
+                <input type="text" id="username" name="username" class="custom-input" required>
+
+                <label for="password">Password:</label>
+                <input type="password" id="password" name="password" class="custom-input" required>
+
+                <button id="btnSignin" type="button" class="button">Sign In</button>
+                <button id="btnCreate" type="button" class="button">Create Account</button>
+            </form>
+        </div>
+
+    
+    </div>
+
+    <%- include("./partials/footer.ejs") %>
+
+    <script>
+        const signinForm = document.getElementById('signin-form');
+        const btnSignIn = document.querySelector('#btnSignin');
+        const btnCreate = document.querySelector('#btnCreate');
+
+        btnSignIn.addEventListener('click', () => {
+
+        })
+
+        btnCreate.addEventListener('click', () => {
+            
+        })
+
+        
+    </script>
+</body>
+</html>

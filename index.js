@@ -4,6 +4,8 @@ const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 
+
+
 const port = 3000;
 const dbURI = `mongodb+srv://jeaNode:FTHw8b7Mk44CTNLY@cluster0.kbx9mxa.mongodb.net/tutorial?retryWrites=true&w=majority`;
 
@@ -28,12 +30,78 @@ app.use((req, res, next) => {
   next();
 });
 
+
+////// ENUMS
+const EPasswordRequirment = {
+    MinLenth:10,
+}
+//// END ENUMS
+
+////***CLASSES  */
+class Name{
+    constructor(first,last){
+        this.firstName = first;
+        this.lastName = last;
+    }
+}
+ class UserObject{
+    constructor(obj){
+        this.name = obj.name;
+        this.userName = obj.name;
+        this.password = obj.password;
+    }
+}
+  class User{
+    constructor(obj){
+        this.name = obj.name && obj.name.firstName && obj.name.lastName ? new Name(obj.name.firstName, obj.name.lastName) : obj.name ?? null;
+        this.userName = obj.userName ?? null;
+        this.password = obj.password ?? null;
+    }
+    async isGoodPassword(){
+        return (this.password.length >= EPasswordRequirment.MinLenth) ;
+    }
+    async isValid() {
+        return (this.userName && this.password && await this.isGoodPassword())
+    }
+    async getName(){
+        return new Name(this.name.firstName,this.name.lastName);
+    }
+    async getUserName(){
+        return this.userName;
+    }
+    async setPassword(password){
+        this.password = password;
+    }
+    async setUserName(userName){
+        this.userName = userName;
+    }
+    async setName(first,last){
+        this.name = new Name(first,last);
+    }
+    async setUserByObj(obj){
+        if(obj.name && obj.name.firstName && obj.name.lastName){
+            this.name = new Name(obj.name.firstName, obj.name.lastName);
+        }
+        else if(obj.name && obj.name.first && obj.name.last){
+            this.name = new Name(obj.name.first, obj.name.last);
+        }
+        else{
+            this.name = new Name(obj.name,null);
+        }
+        this.userName = obj.userName ?? null;
+        this.password = obj.password ?? null;
+    }
+    getUserObject(){
+        return new UserObject(this);
+    }
+}
 class Teacher {
     constructor(obj){
         this.id = obj.id ?? undefined;
         this.name = obj.name ?? undefined;
     }
 }
+
 class Course {
     constructor(obj){
         this.id = obj.id ?? undefined;
@@ -41,13 +109,16 @@ class Course {
         this.teacher = obj.teacher ?? 0;
     }
 }
-class SendCourse{
+class CourseObj{
     constructor(obj){
         this.id = obj.id ?? undefined;
         this.name = obj.name ?? undefined;
         this.teacher = teachers.find(t => t.id == obj.teacher) ?? new Teacher({});
     }
 }
+////***END CLASSES  */
+
+ 
  
 
 //data 
@@ -143,15 +214,38 @@ app.delete('/api/course/:id',(req,res)=>{
 
 
 
-// Routes
+///////**** INDEX */
 app.get('/', (req, res) => {
     res.redirect('/index');
 });
 
 app.get('/index', (req, res) => {
-    const sendCourses = courses.map(c => new SendCourse(c));
-    res.render('index', { title: 'Index',teachers:teachers, courses:sendCourses });
+    const courseObjs = courses.map(c => new CourseObj(c));
+    res.render('index', { title: 'Index',teachers:teachers, courses:courseObjs });
 });
+
+///////**** END INDEX */
+
+
+
+///////**** FORMS */
+///////**** SIGNIN Form */
+app.get('/signin', (req,res) => {
+    const params = {
+        title: "Sign In"
+    };
+    res.render('signin',params);
+});
+app.get('/createAccount', (req,res) => {
+    const params = {
+        title: "Create New Account"
+    };
+    res.render('createAccount',params);
+});
+///////**** END-SIGNIN Form */
+
+
+///////**** Teacher Form */
 
 app.get('/teacherForm', (req, res) => {
     const teacher = new Teacher({});
@@ -165,6 +259,7 @@ app.get('/teacherForm', (req, res) => {
         buttonLabel: 'Create New Teacher'
     });
 })
+
 app.get('/teacherForm/:id', (req, res) => {
     const teacher = teachers.at(req.params.id);
     res.render('teacherForm', 
@@ -177,22 +272,9 @@ app.get('/teacherForm/:id', (req, res) => {
         buttonLabel: `Edit Teacher: ${teacher.id}`
     });
 })
+///////**** End Teacher Form */
 
-
-app.get('/teachers', (req, res) => {
-    // Assuming teachersData is an array of teachers retrieved from your database
-
-
-    res.render('teachers', { title: 'Teachers',  teachers: teachers });
-});
-
-// ...
-
-app.get('/courses', (req,res) => {
-    const sendingCourses = courses.map(c => new SendCourse(c));
-    res.render('courses', { title: 'Index', courses:sendingCourses });
-});
-
+///////**** COURSE FORM */
 app.get('/courseForm', (req, res) => {
     // Assuming you have a way to retrieve a course, replace this with your actual logic
     const course = {
@@ -227,7 +309,20 @@ app.get('/courseForm/:id', (req,res) => {
     
 });
 
-// ...
+///////**** END COURSE FORM */
+///////**** END FORMS */
+
+///////**** Tables */
+app.get('/teachers', (req, res) => {
+    res.render('teachers', { title: 'Teachers',  teachers: teachers });
+});
+
+app.get('/courses', (req,res) => {
+    const sendingCourses = courses.map(c => new CourseObj(c));
+    res.render('courses', { title: 'Index', courses:sendingCourses });
+});
+
+///////**** END TABLES */
 
 
 
@@ -236,9 +331,9 @@ app.get('/courseForm/:id', (req,res) => {
 
 
 
-// Add more routes as needed
-
-// 404 Page
+///////**** 404 Page */
 app.use((req, res) => {
     res.status(404).render('404', { title: '404 Page Not Found' });
 });
+
+///////**** END 404 Page */
