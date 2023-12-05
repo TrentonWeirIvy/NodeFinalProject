@@ -11,7 +11,7 @@
     <form action="<%= formAction %>" method="POST" class="modern-form">
       <div class="form-group">
         <label for="courseName" class="modern-label">Course Name:</label>
-        <input data-id="<% course.id %>" type="text" id="courseName" name="courseName" value="<%= course ? course.name : '' %>" class="custom-input" required>
+        <input data-id="<%= course && course.id !== undefined ? course.id : null %>" type="text" id="courseName" name="courseName" value="<%= course ? course.name : '' %>" class="custom-input" required>
 
       </div>
 
@@ -48,7 +48,6 @@
       inputCourseName.focus();
   
       document.querySelector('#submitButton').addEventListener('click', () => {
-        // Retrieve input values for creating a new course
         const newCourse = {
           id: inputCourseName.getAttribute('data-id'),
           name: inputCourseName.value,
@@ -56,14 +55,14 @@
         };
   
         // Send a POST request to create a new course
-        axios.post(`./api/course/${JSON.stringify(newCourse)}`).then(res => {
+        axios.post(`../api/course/${JSON.stringify(newCourse)}`).then(res => {
           console.log(res);
           if (res.status === 200) {
             alert('Course Created, ID: ' + res.data);
           } else {
             alert('Failed to create ' + newCourse.name);
           }
-        }).catch(e => alert(e));
+        }).then(window.location.assign(`${window.location.origin}\\courses`)).catch(e => alert(e));
       });
   </script>
   >

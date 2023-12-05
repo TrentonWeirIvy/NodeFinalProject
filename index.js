@@ -70,21 +70,25 @@ app.get('/api/teachers/:id', (req,res)=>{
     const id = req.params.id;
     res.json(teachers.at(id));
 });
-app.post('/api/teacher/:name', (req,res)=>{
-    const teach = JSON.parse(req.params.name);
-    const name = teach.name;
-    console.log(teach);
-    if(!teachers.includes(name)){
-        let id = teachers.length;
-        teachers.push(new Teacher({
-            id,name
-        }));
-        res.json(teachers.at(id));
+app.post('/api/teacher/:teacher', (req, res) => {
+    const teacher = new Teacher(JSON.parse(req.params.teacher));
+    console.log(teacher);
+    if([undefined,'',null].includes(teacher.id)){
+        teacher.id = (teachers[teachers.length-1].id + 1);
+        teachers.push(teacher);
+        res.json(teacher);
     }
-});
-app.put('/api/teacher/:id', (req,res)=>{
-    const id = req.params.id;
-});
+    else{
+        teachers[teacher.id] = teacher;
+        res.json(teacher);
+    }
+})
+app.put('/api/teacher/:teacher', (req, res) => {
+
+    const teacher = new Teacher(JSON.parse(req.params.teacher));
+    teachers[teacher.id] = teacher;
+    res.json(teacher);
+})
 app.delete('/api/teacher/:id', (req,res)=>{
     const id = req.params.id;
 });
@@ -104,7 +108,6 @@ app.post('/api/course/:course',(req,res)=>{
         name: courseData.name,
         teacher: teacher
     });
-    console.log(course);
     if ([null, '', undefined].includes(course.id)) {
 
         const id = courses.at(courses.length-1).id + 1;
@@ -113,8 +116,9 @@ app.post('/api/course/:course',(req,res)=>{
         res.json(id);
     }
     else {
-        courses[courses.indexOf(c => c.id = course.id)] = course;
-        res.json(course.id);
+        console.log(course.id)
+        courses[course.id] = course;
+        res.json(course);
     }
 
 });
@@ -165,6 +169,7 @@ app.get('/teacherForm/:id', (req, res) => {
         buttonLabel: `Edit Teacher: ${teacher.id}`
     });
 })
+
 
 app.get('/teachers', (req, res) => {
     // Assuming teachersData is an array of teachers retrieved from your database
