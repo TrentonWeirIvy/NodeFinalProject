@@ -38,7 +38,14 @@ class Course {
     constructor(obj){
         this.id = obj.id ?? undefined;
         this.name = obj.name ?? undefined;
-        this.teacher = obj.teacher ?? new Teacher({});
+        this.teacher = obj.teacher ?? 0;
+    }
+}
+class SendCourse{
+    constructor(obj){
+        this.id = obj.id ?? undefined;
+        this.name = obj.name ?? undefined;
+        this.teacher = teachers.find(t => t.id == obj.teacher) ?? new Teacher({});
     }
 }
  
@@ -57,7 +64,7 @@ var courses = Array.from({length:10}, (_,index) =>{
     return new Course({
         id: index,
         name: `Course ${index}`,
-        teacher: teachers[index]
+        teacher: teachers[index].id
     });
 } );
 
@@ -106,7 +113,7 @@ app.post('/api/course/:course',(req,res)=>{
     const course = new Course({
         id: courseData.id == '' ? null : courseData.id,
         name: courseData.name,
-        teacher: teacher
+        teacher: teacher.id
     });
     if ([null, '', undefined].includes(course.id)) {
 
@@ -181,7 +188,8 @@ app.get('/teachers', (req, res) => {
 // ...
 
 app.get('/courses', (req,res) => {
-    res.render('courses', { title: 'Index', courses:courses });
+    const sendingCourses = courses.map(c => new SendCourse(c));
+    res.render('courses', { title: 'Index', courses:sendingCourses });
 });
 
 app.get('/courseForm', (req, res) => {
