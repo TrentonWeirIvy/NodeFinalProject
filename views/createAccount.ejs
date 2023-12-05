@@ -20,19 +20,27 @@
 
                 <label for="password">Password:</label>
                 <input type="password" id="password" name="password" class="custom-input" required>
-
-                <button type="button" class="button">Create User</button>
+                
+                <button id="btnCreate" type="button" class="button">Create Account</button>
+                <button id="btnSignin" type="button" class="button">Sign In</button>
+                
+            
             </form>
         </div>
     </div>
 
     <%- include("./partials/footer.ejs") %>
 
+
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
     <script>
         const signinForm = document.getElementById('signin-form');
-        const inputs = signinForm.querySelectorAll('input');
-        inputs[0].focus();
-        inputs.forEach((input, index) => {
+            const btnSignIn = document.querySelector('#btnSignin');
+            const btnCreate = document.querySelector('#btnCreate');
+            const inputs = signinForm.querySelectorAll('input');
+            inputs[0].focus();
+            inputs.forEach((input, index) => {
             input.addEventListener('keydown', (event) => {
               if (['Enter','ArrowDown'].includes(event.key)) {
                 event.preventDefault();
@@ -47,18 +55,27 @@
             });
           });
 
-        document.querySelector('.nav-links').addEventListener('click', (event) => {
-            if (event.target.tagName === 'A') {
-                const targetId = event.target.getAttribute('data-target');
-                if (targetId === 'signin') {
-                    signinForm.style.display = 'block';
-                    signupForm.style.display = 'none';
-                } else if (targetId === 'signup') {
-                    signinForm.style.display = 'none';
-                    signupForm.style.display = 'block';
-                }
-            }
-        });
+          
+  
+          btnSignIn.addEventListener('click', () => {
+            window.location.assign(`${window.location.origin}\\signin`)
+          })
+  
+          btnCreate.addEventListener('click', async () => {
+              const user = {
+                name: {
+                    firstName: document.querySelector('#firstname').value,
+                    lastName: document.querySelector('#lastname').value
+                },
+                userName: document.querySelector('#username').value,
+                password: document.querySelector('#password').value
+              }
+              axios.post(`../api/createUser/${JSON.stringify(user)}`).then(res => {
+                console.log(res.data);
+              })
+              
+
+          })
     </script>
 </body>
 </html>

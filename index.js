@@ -47,7 +47,7 @@ class Name{
  class UserObject{
     constructor(obj){
         this.name = obj.name;
-        this.userName = obj.name;
+        this.userName = obj.userName;
         this.password = obj.password;
     }
 }
@@ -116,6 +116,23 @@ class CourseObj{
         this.teacher = teachers.find(t => t.id == obj.teacher) ?? new Teacher({});
     }
 }
+
+const EResult = {
+        OK: true,
+        ERROR: false,
+        Messages: {
+            PASSWORD_NOT_LONG_ENOUGH: "PASSWORD DID NOT MEET THE MINIMUM LENGTH",
+            USER_INCOMPLETE: "THE USER INFO WAS NOT COMPLETELY FILLED OUT",
+        }
+}
+
+class Result{
+    constructor(obj){
+        this.Successful = obj.ok ?? EResult.OK;
+        this.errorMessage = obj.errorMessage ?? obj.error ?? null;
+        this.result = obj.result ?? {}
+    }
+}
 ////***END CLASSES  */
 
  
@@ -139,8 +156,50 @@ var courses = Array.from({length:10}, (_,index) =>{
     });
 } );
 
+var users = Array.from({length:1}, (_,index) => {
+    return new UserObject({
+        name: new Name('Trenton', 'Weir'),
+        userName:'admin',
+        password: 'admin'
+    });
+});
+
 
 ///- api
+app.post('/api/createUser/:user', (req,res) => {
+    const user = new User(JSON.parse(req.params.user));
+    if(!user.isValid() && !user.isGoodPassword()){
+        res.json(new Result({
+            Successful: EResult.ERROR, 
+            errorMessage: EResult.Messages.PASSWORD_NOT_LONG_ENOUGH,
+            result:{status:"PASSWORD NOT LONG ENOUGH"}
+        }));
+    } 
+    if(!user.isValid()) res.json(new Result({
+        Successful: EResult.ERROR,
+        errorMessage: EResult.Messages.USER_INCOMPLETE,
+        result: {status: "OBJECT INCOMPLETE"}
+    }));
+    const newUser = user.getUserObject();
+    users.push(newUser);
+    const userIndex = users.findIndex(u => u.userName == newUser.userName && u.password == newUser.password);
+    res.json({id:userIndex})
+    console.log(users);
+
+});
+app.get('/api/sign-in', (req,res) => {
+    const user = new User(JSON.parse(req.params.user));
+    const newUser = user.getUserObject();
+    const userIndex = users.findIndex(u => u.userName == newUser.userName && u.password == newUser.password);
+    if(userIndex){
+        res.json(users.at(userIndex));
+    }
+    else{
+        res.json({error: 'USER NOT FOUND'})
+    }
+    console.log(users);
+});
+
 app.get('/api/teachers', (req,res)=>{
     res.json(teachers);
 });
@@ -216,7 +275,8 @@ app.delete('/api/course/:id',(req,res)=>{
 
 ///////**** INDEX */
 app.get('/', (req, res) => {
-    res.redirect('/index');
+    res.render('signin', {title:"Sign In"})
+    //res.redirect('/index');
 });
 
 app.get('/index', (req, res) => {
