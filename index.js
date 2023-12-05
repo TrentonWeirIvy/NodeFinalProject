@@ -149,7 +149,8 @@ app.get('/', (req, res) => {
 });
 
 app.get('/index', (req, res) => {
-    res.render('index', { title: 'Index',teachers:teachers, courses:courses });
+    const sendCourses = courses.map(c => new SendCourse(c));
+    res.render('index', { title: 'Index',teachers:teachers, courses:sendCourses });
 });
 
 app.get('/teacherForm', (req, res) => {
