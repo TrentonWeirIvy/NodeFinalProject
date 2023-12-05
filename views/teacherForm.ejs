@@ -22,7 +22,7 @@
 
 <script>
   document.querySelector('#submitButton').addEventListener('click', () => {
-    const id = this.getAttribute('data-id');
+    const id = document.querySelector('#teacherName').getAttribute('data-id');
     const teacherName = document.querySelector('#teacherName').value;
     const newTeach = { name: teacherName, id: id };
     axios.post(`./api/teacher/${JSON.stringify(newTeach)}`).then(res => {
