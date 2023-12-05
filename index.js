@@ -97,10 +97,26 @@ app.get('/api/course/:id',(req,res)=>{
     res.json(courses.at(req.params.id));
 });
 app.post('/api/course/:course',(req,res)=>{
-    const course = JSON.parse(req.params.course);
+    const courseData = JSON.parse(req.params.course);
+    const teacher = teachers.at(courseData.teacher);
+    const course = new Course({
+        id: courseData.id == '' ? null : courseData.id,
+        name: courseData.name,
+        teacher: teacher
+    });
     console.log(course);
-    let id = courses.push(course);
-    res.json(id);
+    if ([null, '', undefined].includes(course.id)) {
+
+        const id = courses.at(courses.length-1).id + 1;
+        course.id = id;
+        courses.push(course);
+        res.json(id);
+    }
+    else {
+        courses[courses.indexOf(c => c.id = course.id)] = course;
+        res.json(course.id);
+    }
+
 });
 app.put('/api/course/:course/:id',(req,res)=>{
     const id = req.params.id;
@@ -137,6 +153,18 @@ app.get('/teacherForm', (req, res) => {
         buttonLabel: 'Create New Teacher'
     });
 })
+app.get('/teacherForm/:id', (req, res) => {
+    const teacher = teachers.at(req.params.id);
+    res.render('teacherForm', 
+    {
+        pageTitle: 'Edit Teacher',
+        title:'Edit Teachers',
+        formAction:'/teachers', 
+        teachers: teachers, 
+        teacher: teacher,
+        buttonLabel: `Edit Teacher: ${teacher.id}`
+    });
+})
 
 app.get('/teachers', (req, res) => {
     // Assuming teachersData is an array of teachers retrieved from your database
@@ -160,13 +188,13 @@ app.get('/courseForm', (req, res) => {
 
     // Pass the course variable to the view
     res.render('courseForm', {
-        title: 'Course Form',
-        pageTitle: 'Course Form',
+        title: 'Create New Course',
+        pageTitle: 'Create New Course',
         formAction: '/courses',
         teachers,
         courses,
         course,
-        buttonLabel: 'Submit'
+        buttonLabel: 'Create Course'
     });
 });
 
@@ -174,13 +202,13 @@ app.get('/courseForm/:id', (req,res) => {
     const course = courses.find(c => c.id == req.params.id) ?? new Course({});
 
     res.render('courseForm', {
-        title: 'Course Form',
-        pageTitle: 'Course Form',
+        title: `Edit Course: ${course.id}`,
+        pageTitle: `Edit Course: ${course.id}`,
         formAction: '/courses',
         teachers,
-        courses,
-        course,
-        buttonLabel: 'Submit'
+        courses:courses,
+        course:course,
+        buttonLabel: `Edit Course: ${course.id}`
     });
     
 });

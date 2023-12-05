@@ -21,7 +21,7 @@
           <div class="select-wrapper">
             <select id="teacher" name="teacher" class="select custom-select" required>
               <% teachers.forEach(teacher => { %>
-                <option value="<%= teacher.name %>" <%= course && course.teacher === teacher.name ? 'selected' : '' %>><%= teacher.name %></option>
+                <option value="<%= teacher.id %>" <%= course && course.teacher.name === teacher.name ? 'selected' : '' %>><%= teacher.name %></option>
               <% }); %>
             </select>
             <div class="select-arrow">&#9660;</div>
@@ -42,24 +42,31 @@
 
   <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 
-<script>
-  document.querySelector('#submitButton').addEventListener('click', () => {
+  <script>
 
-    const newCourse = {
-      id: document.querySelector('#courseName').getAttribute('data-id'),
-      name: document.querySelector('#courseName').value,
-      teacher: document.querySelector('#teacher').value
-    }
-
-    axios.post(`./api/course/${JSON.stringify(newCourse)}`).then(res => {
-      console.log(res)
-      if (res.status == 200) {
-        alert('Teacher Created, ID: ' + res.data.id)
-      } else {
-        alert("Failed to create " + teacherName)
-      }
-    }).catch(e => alert(e));
-  })
-</script>
+      const inputCourseName = document.querySelector('#courseName');
+      inputCourseName.focus();
+  
+      document.querySelector('#submitButton').addEventListener('click', () => {
+        // Retrieve input values for creating a new course
+        const newCourse = {
+          id: inputCourseName.getAttribute('data-id'),
+          name: inputCourseName.value,
+          teacher: document.querySelector('#teacher').value
+        };
+  
+        // Send a POST request to create a new course
+        axios.post(`./api/course/${JSON.stringify(newCourse)}`).then(res => {
+          console.log(res);
+          if (res.status === 200) {
+            alert('Course Created, ID: ' + res.data);
+          } else {
+            alert('Failed to create ' + newCourse.name);
+          }
+        }).catch(e => alert(e));
+      });
+  </script>
+  >
 </body>
+
 </html>

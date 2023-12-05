@@ -16,7 +16,7 @@
       </thead>
       <tbody>
         <% teachers.forEach(teacher => { %>
-          <tr>
+          <tr  data-id="<%= teacher.id %>" class="course-row">
             <td><%= teacher.name %></td>
           </tr>
         <% }); %>
@@ -25,5 +25,16 @@
   </div>
 
   <%- include("./partials/footer.ejs") %>
+
+  <script>
+    // Add event listener to each row in the courses table
+      document.querySelectorAll('.course-row').forEach(row => {
+      row.addEventListener('click', function () {
+        const id = row.dataset.id;
+        window.location.assign(window.location.origin + '/teacherForm/' + id);
+      });
+    });
+    
+  </script>
 </body>
 </html>
