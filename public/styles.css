@@ -56,12 +56,17 @@ body {
 .nav-links a {
   text-decoration: none;
   color: var(--secondary-color);
-  transition: color 0.3s ease-in-out;
+  padding: 10px 15px; /* Add padding to create a button-like appearance */
+  border: 1px solid var(--secondary-color); /* Add a border for a button-like look */
+  border-radius: 5px; /* Optional: Add border-radius for rounded corners */
+  transition: color 0.3s ease-in-out, background-color 0.3s ease-in-out, border-color 0.3s ease-in-out;
 }
 
 .nav-links a:hover {
   color: var(--primary-color);
+  border-color: var(--primary-color);
 }
+
 
 .container {
   max-width: 1200px;
