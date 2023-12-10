@@ -8,12 +8,6 @@
         <div id="signin-form" class="auth-form">
             <h2><%= title %></h2>
             <form>
-
-                        <label for="firstname">First Name</label>
-                        <input type="text" id="firstname" name="firstname" class="custom-input" required>
-
-                        <label for="lastname">Last Name</label>
-                        <input type="text" id="lastname" name="lastname" class="custom-input" required>
        
                 <label for="username">Username:</label>
                 <input type="text" id="username" name="username" class="custom-input" required>
@@ -62,20 +56,16 @@
           })
   
           btnCreate.addEventListener('click', async () => {
-              const user = {
-                name: {
-                    firstName: document.querySelector('#firstname').value,
-                    lastName: document.querySelector('#lastname').value
-                },
-                userName: document.querySelector('#username').value,
-                password: document.querySelector('#password').value
-              }
-              axios.post(`../api/createUser/${JSON.stringify(user)}`).then(res => {
-                console.log(res.data);
-              })
-              
+    const user = {
+        username: document.querySelector('#username').value,
+        password: document.querySelector('#password').value
+    };
 
-          })
+    axios.post('../api/createUser', user).then(res => {
+        console.log(res.data);
+    });
+});
+
     </script>
 </body>
 </html>
