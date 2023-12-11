@@ -7,33 +7,34 @@
   <div class="content container">
     <h2>Teachers</h2>
 
-    <!-- Display list of teachers in a table -->
-    <table class="mui-table">
-      <thead>
-        <tr>
-          <th>Name</th>
-        </tr>
-      </thead>
-      <tbody>
-        <% teachers.forEach(teacher => { %>
-          <tr  data-id="<%= teacher.id %>" class="course-row">
-            <td><%= teacher.name %></td>
-          </tr>
-        <% }); %>
-      </tbody>
-    </table>
   </div>
 
   <%- include("./partials/footer.ejs") %>
 
+  <script src="./createTable.js"></script>
+
   <script>
-    // Add event listener to each row in the courses table
-      document.querySelectorAll('.course-row').forEach(row => {
-      row.addEventListener('click', function () {
-        const id = row.dataset.id;
-        window.location.assign(window.location.origin + '/teacherForm/' + id);
-      });
-    });
+
+    const setCookie = (id) => {
+      sessionStorage.setItem('teacherId', id)
+    }
+    const setUpTable = async () => {
+      await axiosGet('./api/teachers').then(async teachers => {
+        const table = await createTable(teachers.data);
+        const container = document.querySelector('.container');
+        table.querySelectorAll('tr').forEach(async row => {
+          const id = row.dataset.id;
+          row.addEventListener('click', () => {
+            setCookie(id);
+            window.location.assign(window.location.origin + '/teacherForm');
+          });
+        });
+        container.append(table);
+      })
+      .catch(e => console.error(e));
+    }
+    setUpTable();
+    
     
   </script>
 </body>

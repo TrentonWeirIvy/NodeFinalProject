@@ -24,43 +24,50 @@
 
     <%- include("./partials/footer.ejs") %>
     
-    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    
 
     <script>
-        const signinForm = document.getElementById('signin-form');
-        const btnSignIn = document.querySelector('#btnSignin');
-        const btnCreate = document.querySelector('#btnCreate');
-        const inputs = signinForm.querySelectorAll('input');
-        inputs[0].focus();
-        inputs.forEach((input, index) => {
+         setAuth();
+    const signinForm = document.getElementById('signin-form');
+    const btnSignIn = document.querySelector('#btnSignin');
+    const btnCreate = document.querySelector('#btnCreate');
+    const inputs = signinForm.querySelectorAll('input');
+    
+    inputs[0].focus();
+    
+    inputs.forEach((input, index) => {
         input.addEventListener('keydown', (event) => {
-          if (['Enter','ArrowDown'].includes(event.key)) {
-            event.preventDefault();
-            if (index < inputs.length - 1) {
-              inputs[index + 1].focus();
+            if (['Enter', 'ArrowDown'].includes(event.key)) {
+                event.preventDefault();
+                if (index < inputs.length - 1) {
+                    inputs[index + 1].focus();
+                }
+            } else if (event.key === 'ArrowUp') {
+                if (index > 0) {
+                    inputs[index - 1].focus();
+                }
             }
-          } else if (event.key === 'ArrowUp') {
-            if (index > 0) {
-              inputs[index - 1].focus();
-            }
-          }
         });
-      });
-        btnSignIn.addEventListener('click', () => {
+    });
+
+    btnSignIn.addEventListener('click', async () => {
+        try {
             const user = {
                 username: document.querySelector('#username').value,
                 password: document.querySelector('#password').value
-            }
-            axios.get(`../api/sign-in/${JSON.stringify(user)}`).then(res => {
-                console.log(res.data);
-            })
-        })
+            };
 
-        btnCreate.addEventListener('click', () => {
-            window.location.assign(`${window.location.origin}\\createAccount`)
-        })
+            // Make a POST request instead of GET
+            const res = await axios.post('../api/sign-in', user);
+            console.log(res.data);
+        } catch (error) {
+            console.error('Error:', error);
+        }
+    });
 
-        
+    btnCreate.addEventListener('click', () => {
+        window.location.assign(`${window.location.origin}/createAccount`);
+    });
     </script>
 </body>
 </html>

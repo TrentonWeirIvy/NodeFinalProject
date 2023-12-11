@@ -8,42 +8,34 @@
   <div class="container">
     <h2>Courses</h2>
 
-    <section class="courses">
-      <table class="mui-table" id="coursesTable">
-        <thead>
-          <tr>
-            <th>Id</th>
-            <th>Name</th>
-            <th>Teacher</th>
-          </tr>
-        </thead>
-        <tbody>
-          <% courses.forEach(c => { %>
-          <tr class="course-row" data-id="<%= c.id %>" data-teacher-id="<%= c.teacher.id %>">
-            <td><%= c.id %></td>
-            <td><%= c.name %></td>
-            <td><%= c.teacher.name %></td>
-          </tr>
-          <% }); %>
-        </tbody>
-      </table>
-    </section>
   </div>
 
   <%- include("./partials/footer.ejs") %>
 
-   <!-- Include Axios library -->
-
+  <script src="./createTable.js"></script>
+  
   <script>
-    
-    // Add event listener to each row in the courses table
-    document.querySelectorAll('.course-row').forEach(row => {
-      row.addEventListener('click', function () {
-        // Log the course.id when a row is clicked
-        let id = this.getAttribute('data-id');
-        window.location.assign(window.location.origin + '/courseForm/' + id);
-      });
-    });
+    const setCookie = (id) => {
+      sessionStorage.setItem('courseId', id)
+    }
+
+    const setUpTable = async () => {
+      await axiosGet('./api/courses').then(async courses => {
+        const table = await createTable(courses.data);
+        const container = document.querySelector('.container');
+        table.querySelectorAll('tr').forEach(async row => {
+          const id = row.dataset.id;
+          row.addEventListener('click', () => {
+            setCookie(id);
+            window.location.assign(window.location.origin + '/courseForm');
+          });
+        });
+        container.append(table);
+      })
+        .catch(e => console.error(e));
+    }
+    setUpTable();
   </script>
-</body>
-</html>
+  </body>
+  
+  </html>

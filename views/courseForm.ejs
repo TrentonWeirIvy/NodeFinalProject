@@ -40,12 +40,35 @@
 
   <%- include("./partials/footer.ejs") %>
 
-  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 
   <script>
 
       const inputCourseName = document.querySelector('#courseName');
+      const select = document.querySelector('select');
+      const input = document.querySelector('input');
+
       inputCourseName.focus();
+
+
+      const getCookie = async () => {
+        return sessionStorage.getItem('courseId');
+      }
+      const setUpForm = async () => {
+        const courseId = await getCookie();
+        const teachers = await axiosGet('../api/teachers');
+        const course = await axiosGet(`../api/courses/${JSON.stringify(courseId)}`);
+        teachers.forEach(teach => {
+          const opt = document.createElement('option');
+          opt.value = teach._id;
+          opt.innerText = teach.name;
+          if(course.teacher == teach._id){
+            opt.selected = true;
+          }
+          select.append(opt);
+        })
+
+      }
+      setUpForm();
   
       document.querySelector('#submitButton').addEventListener('click', () => {
         const newCourse = {

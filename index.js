@@ -19,29 +19,45 @@ app.use((req, res, next) => {
     next();
 });
 
-const port = process.env.PORT ?? 3000;
-const dbURI = process.env.MONGO_CONECTION ?? null;
+const port = process.env.PORT;
+const dbURI = process.env.MONGO_CONECTION;
+const serial = process.env.JWT_SERIALIZE;
 
 
 
 const l = str => console.log(str);
+const checkAuth = async (req, res, next) => {
+    return;
+    const token = req.header('Authorization');
+    const userId = jwt.decode(token, serial);
+    
+    try {
+        const user = await User.findById(userId);
+
+        if (!user) {
+            res.render('signin', { title: 'Sign In' });
+            return; // Return to stop further execution
+        }
+
+        // Attach the user to the request for later use
+        req.user = user;
+        next(); // Call next to move to the next middleware or route handler
+    } catch (error) {
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+};
 
 
 
 if (dbURI) {
     mongoose.connect(dbURI, {  })
-        .catch(err => console.log(err));
+        .catch(err => console.error(err));
 }
 else {
     app.listen(port, () => l(`app running on http://localhost:${port}`))
 }
 const db = dbURI ? mongoose.connection : null;
 
-// Check MongoDB connection
-// db.on('error', console.error.bind(console, 'MongoDB connection error:'));
-// db.once('open', () => {
-//   l('Connected to MongoDB');
-// });
 
 
 //Schemas 
@@ -75,7 +91,7 @@ const Course = mongoose.model('Course', courseSchema);
     ///- api
     // API Endpoints
     app.post('/api/createUser', async (req, res) => {
-        l(req.body);
+        await checkAuth(req,res);
         try {
             const userData = req.body;
             const user = new User(userData);
@@ -88,6 +104,7 @@ const Course = mongoose.model('Course', courseSchema);
     
 
 app.post('/api/sign-in', async (req, res) => {
+    await checkAuth(req,res);
     try {
         const { username, password } = req.body;
         const existingUser = await User.findOne({ username, password });
@@ -158,8 +175,10 @@ app.post('/api/createCourse', async (req, res) => {
     });
 app.get('/api/teachers/:id', async (req, res) => {
     try {
-        const teacherId = req.params.id;
+        const teacherId = JSON.parse(req.params.id);
+        console.log(teacherId)
         const teacher = await Teacher.findById(teacherId);
+        console.log(teacher);
 
         if (teacher) {
             res.json(teacher);
@@ -173,12 +192,10 @@ app.get('/api/teachers/:id', async (req, res) => {
 app.post('/api/teacher', async (req, res) => {
     try {
 
-        console.log(req.body);
         const teacherData = req.body;
         const teacher = new Teacher(teacherData);
         
         if (!teacher._id) {
-            // Assuming that _id is an automatically generated MongoDB ObjectId
             teacher._id = new mongoose.Types.ObjectId();
         }
 
@@ -195,17 +212,13 @@ app.put('/api/teacher/:id', async (req, res) => {
         const updatedTeacherData = req.body;
         const teacherId = req.params.id;
 
-        // Assuming Teacher.findById() is the Mongoose function to find a teacher by ID
         const existingTeacher = await Teacher.findById(teacherId);
 
         if (!existingTeacher) {
             return res.status(404).json({ error: 'Teacher not found' });
         }
 
-        // Update existing teacher properties
         existingTeacher.username = updatedTeacherData.username;
-
-        // Save the updated teacher
         const updatedTeacher = await existingTeacher.save();
 
         res.json(updatedTeacher);
@@ -218,7 +231,6 @@ app.delete('/api/teacher/:id', async (req, res) => {
     try {
         const teacherId = req.params.id;
 
-        // Assuming Teacher.findByIdAndDelete() is the Mongoose function to delete a teacher by ID
         const deletedTeacher = await Teacher.findByIdAndDelete(teacherId);
 
         if (!deletedTeacher) {
@@ -235,7 +247,6 @@ app.delete('/api/teacher/:id', async (req, res) => {
 
 app.get('/api/courses', async (req, res) => {
     try {
-        // Assuming Course.find() is the Mongoose function to retrieve all courses
         const courses = await Course.find();
         res.json(courses);
     } catch (error) {
@@ -245,9 +256,8 @@ app.get('/api/courses', async (req, res) => {
 
 app.get('/api/course/:id', async (req, res) => {
     try {
-        const courseId = req.params.id;
+        const courseId = JSON.parse(req.params.id);
 
-        // Assuming Course.findById() is the Mongoose function to find a course by ID
         const course = await Course.findById(courseId);
 
         if (!course) {
@@ -264,8 +274,6 @@ app.post('/api/course', async (req, res) => {
     try {
         const courseData = req.body;
         const teacherId = courseData.teacher;
-
-        // Assuming Teacher.findById() is the Mongoose function to find a teacher by ID
         const teacher = await Teacher.findById(teacherId);
 
         if (!teacher) {
@@ -288,8 +296,6 @@ app.put('/api/course/:id', async (req, res) => {
     try {
         const courseId = req.params.id;
         const updatedCourseData = req.body;
-
-        // Assuming Course.findByIdAndUpdate() is the Mongoose function to update a course by ID
         const updatedCourse = await Course.findByIdAndUpdate(courseId, updatedCourseData, { new: true });
 
         if (!updatedCourse) {
@@ -305,8 +311,6 @@ app.put('/api/course/:id', async (req, res) => {
 app.delete('/api/course/:id', async (req, res) => {
     try {
         const courseId = req.params.id;
-
-        // Assuming Course.findByIdAndDelete() is the Mongoose function to delete a course by ID
         const deletedCourse = await Course.findByIdAndDelete(courseId);
 
         if (!deletedCourse) {
@@ -327,12 +331,13 @@ app.delete('/api/course/:id', async (req, res) => {
 
 
 ///////**** INDEX */
-app.get('/', (req, res) => {
-    res.render('signin', { title: "Sign In" })
-    //res.redirect('/index');
+app.get('/', async (req, res) => {
+    await checkAuth(req,res);
+    res.redirect('/index');
 });
 
 app.get('/index', async (req, res) => {
+    await checkAuth(req,res);
     const courses = await Course.find();
     const teachers = await Teacher.find();
     l(teachers);
@@ -345,54 +350,34 @@ app.get('/index', async (req, res) => {
 
 ///////**** FORMS */
 ///////**** SIGNIN Form */
-app.get('/signin', (req, res) => {
-    const params = {
-        title: "Sign In"
-    };
-    res.render('signin', params);
+app.get('/signin', async (req, res) => {
+    await checkAuth(req,res);
+    res.redirect('/index');
 });
-app.get('/createAccount', (req, res) => {
-    const params = {
-        title: "Create New Account"
-    };
-    res.render('createAccount', params);
+app.get('/createAccount', async (req, res) => {
+    res.render('createAccount', {title:"Create New Account"});
 });
 ///////**** END-SIGNIN Form */
-
 
 ///////**** Teacher Form */
 
 app.get('/teacherForm', async (req, res) => {
-    const teacher = new Teacher();
-    const teachers = await Teacher.find();
+    await checkAuth(req,res);
     res.render('teacherForm',
         {
             pageTitle: 'Create Teacher',
             title: 'Teachers',
             formAction: '/teachers',
-            teachers: teachers,
-            teacher: teacher,
+            teacher: {},
             buttonLabel: 'Create New Teacher'
         });
 })
 
-app.get('/teacherForm/:id', async (req, res) => {
-    const teacher = await Teacher.findById(req.params.id);
-    const teachers = await Teacher.find();
-    res.render('teacherForm',
-        {
-            pageTitle: 'Edit Teacher',
-            title: 'Edit Teachers',
-            formAction: '/teachers',
-            teachers: teachers,
-            teacher: teacher,
-            buttonLabel: `Edit Teacher: ${teacher.id}`
-        });
-})
 ///////**** End Teacher Form */
 
 ///////**** COURSE FORM */
 app.get('/courseForm', async (req, res) => {
+    await checkAuth(req,res);
     const courses = await Course.find();
     const teachers = await Teacher.find();
 
@@ -413,35 +398,19 @@ app.get('/courseForm', async (req, res) => {
     });
 });
 
-app.get('/courseForm/:id', async (req, res) => {
-    const course = await Course.findById(req.params.id);
-    const courses = await Course.find();
-    const teachers = await Teacher.find();
-
-    res.render('courseForm', {
-        title: `Edit Course: ${course.id}`,
-        pageTitle: `Edit Course: ${course.id}`,
-        formAction: '/courses',
-        teachers,
-        courses: courses,
-        course: course,
-        buttonLabel: `Edit Course: ${course.id}`
-    });
-
-});
 
 ///////**** END COURSE FORM */
 ///////**** END FORMS */
 
 ///////**** Tables */
 app.get('/teachers', async (req, res) => {
-    const teachers = await Teacher.find();
-    res.render('teachers', { title: 'Teachers', teachers: teachers });
+    await checkAuth(req,res);
+    res.render('teachers', { title: 'Teachers' });
 });
 
 app.get('/courses', async (req, res) => {
-    const courses = await Course.find();
-    res.render('courses', { title: 'Index', courses: courses });
+    await checkAuth(req,res);
+    res.render('courses', { title: 'Courses' });
 });
 
 ///////**** END TABLES */

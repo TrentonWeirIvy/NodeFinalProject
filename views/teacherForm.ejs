@@ -8,9 +8,9 @@
     <h2 class="card-title modern-title"><%= pageTitle %></h2>
 
     <!-- Course Form -->
-    <form action="<%= formAction %>" method="POST" class="card-content modern-form">
+    <form method="POST" class="card-content modern-form">
       <label for="teacherName" class="modern-label">Teacher Name:</label>
-      <input type="text" data-id="<%= teacher && teacher.id !== undefined ? teacher.id : null %>" id="teacherName" name="courseName" value="<%= teacher ? teacher.name : '' %>" class="custom-input" required>
+      <input type="text" id="teacherName" name="courseName" value="" class="custom-input" required>
       <button id="submitButton" type="button" class="button modern-button"><%= buttonLabel %></button>
     </form>
   </div>
@@ -21,6 +21,32 @@
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 
 <script>
+  const input = document.querySelector('input');
+  const btn = document.querySelector('button');
+  const h2 = document.querySelector('h2');
+
+
+  const getCookie = async () => {
+    return sessionStorage.getItem('teacherId');
+  }
+  const setUpForm = async () => {
+      const id = await getCookie();
+      console.log(id);
+      if(id){
+        await axiosGet(`../api/teachers/${JSON.stringify(id)}`)
+          .then(json => json.data)
+          .then(teacher => {
+            console.log(teacher);
+            input.dataset.id = teacher._id;
+            input.value = teacher.name;
+            btn.innerText = `Update: ${teacher.name}`;
+            h2.innerText = `Update: ${teacher._id}`;
+          })
+          .catch(e => console.error(e))
+          .finally(() => sessionStorage.clear());
+      }
+  }
+  setUpForm();
   document.querySelector('#submitButton').addEventListener('click', () => {
     const id = document.querySelector('#teacherName').dataset.id;
     const teacherName = document.querySelector('#teacherName').value;
