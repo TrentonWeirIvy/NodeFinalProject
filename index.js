@@ -26,14 +26,13 @@ const serial = process.env.JWT_SERIALIZE;
 
 
 const l = str => console.log(str);
-const checkAuth = async (req, res, next) => {
+const checkAuth = async (req) => {
     //return;
     const token = req.headers['authentication'];
     const obj = jwt.decode(token, serial);
     const time = new Date(obj?.date);
-    if(await User.exists({_id: obj?.userId})){
-        return (time > new Date())
-    }
+    const isGood = await User.exists({_id: obj?.userId}) && (time > new Date())
+    console.log(isGood);
     return false;
 };
 
@@ -96,7 +95,7 @@ const Course = mongoose.model('Course', courseSchema);
 
 
     app.post('/api/signin', async (req, res) => {
-        if(await checkAuth(req,res)){
+        if(await checkAuth(req)){
             res.redirect('/index');
             return;
         }
@@ -349,12 +348,11 @@ app.delete('/api/course/:id', async (req, res) => {
 
 ///////**** INDEX */
 app.get('/', async (req, res) => {
-    await checkAuth(req,res);
-    res.redirect('/index');
+    res.redirect('/signin');
 });
 
 app.get('/index', async (req, res) => {
-    await checkAuth(req,res);
+    await checkAuth(req);
     const courses = await Course.find();
     const teachers = await Teacher.find();
     l(teachers);
@@ -368,11 +366,14 @@ app.get('/index', async (req, res) => {
 ///////**** FORMS */
 ///////**** SIGNIN Form */
 app.get('/signin', async (req, res) => {
-    await checkAuth(req,res);
+    l("HIT")
+    if(await checkAuth(req)){
+        res.redirect('/index');
+        return;
+    }
     res.render('signin', {
         title:'Sign In'
     })
-    //res.redirect('/index');
 });
 app.get('/createAccount', async (req, res) => {
     res.render('createAccount', {title:"Create New Account"});
@@ -382,7 +383,7 @@ app.get('/createAccount', async (req, res) => {
 ///////**** Teacher Form */
 
 app.get('/teacherForm', async (req, res) => {
-    await checkAuth(req,res);
+    await checkAuth(req);
     res.render('teacherForm',
         {
             pageTitle: 'Create Teacher',
@@ -397,7 +398,7 @@ app.get('/teacherForm', async (req, res) => {
 
 ///////**** COURSE FORM */
 app.get('/courseForm', async (req, res) => {
-    await checkAuth(req,res);
+    await checkAuth(req);
     const courses = await Course.find();
     const teachers = await Teacher.find();
 
@@ -424,12 +425,12 @@ app.get('/courseForm', async (req, res) => {
 
 ///////**** Tables */
 app.get('/teachers', async (req, res) => {
-    await checkAuth(req,res);
+    await checkAuth(req);
     res.render('teachers', { title: 'Teachers' });
 });
 
 app.get('/courses', async (req, res) => {
-    await checkAuth(req,res);
+    await checkAuth(req);
     res.render('courses', { title: 'Courses' });
 });
 
