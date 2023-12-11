@@ -22,14 +22,8 @@
       await axiosGet('./api/teachers').then(async teachers => {
         const table = await createTable(teachers.data);
         const container = document.querySelector('.container');
-        table.querySelectorAll('tr').forEach(async row => {
-          const id = row.dataset.id;
-          row.addEventListener('click', () => {
-            setCookie(id);
-            window.location.assign(window.location.origin + '/teacherForm');
-          });
-        });
         container.append(table);
+        teacherAddButtons(table);
       })
       .catch(e => console.error(e));
     }

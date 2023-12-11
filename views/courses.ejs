@@ -23,18 +23,14 @@
       await axiosGet('./api/courses').then(async courses => {
         const table = await createTable(courses.data);
         const container = document.querySelector('.container');
-        table.querySelectorAll('tr').forEach(async row => {
-          const id = row.dataset.id;
-          row.addEventListener('click', () => {
-            setCookie(id);
-            window.location.assign(window.location.origin + '/courseForm');
-          });
-        });
         container.append(table);
+        courseAddButtons(table);
       })
         .catch(e => console.error(e));
     }
     setUpTable();
+
+
   </script>
   </body>
   

@@ -15,3 +15,13 @@ const axiosGet = async (url, obj) => {
     axios.defaults.headers.common['Authorization'] = token; 
     return await axios.get(url, obj);
 }
+const axiosPut = async (url, obj) => {
+    const token = await getAuth();
+    axios.defaults.headers.common['Authorization'] = token;
+    return await axios.put(url, obj)
+}
+const axiosDelete = async (url,obj) => {
+    const token = await getAuth();
+    axios.defaults.headers.common['Authorization'] = token;
+    return await axios.delete(url, obj)
+}

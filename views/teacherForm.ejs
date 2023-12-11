@@ -47,18 +47,28 @@
       }
   }
   setUpForm();
-  document.querySelector('#submitButton').addEventListener('click', () => {
-    const id = document.querySelector('#teacherName').dataset.id;
+
+  document.querySelector('#submitButton').addEventListener('click', async () => {
+  try {
+    const id = input.dataset.id;
     const teacherName = document.querySelector('#teacherName').value;
-    const newTeach = { name: teacherName, id: id };
-    axios.post(`../api/teacher/${JSON.stringify(newTeach)}`).then(res => {
-      console.log(res)
-      if (res.status == 200) {
-        alert('Teacher Created, ID: ' + res.data.id)
-      } else {
-        alert("Failed to create " + teacherName)
-      }
-    }).then(window.location.assign(`${window.location.origin}\\teachers`)).catch(e => alert(e));
-  })
+
+    const newTeach = id ? { name: teacherName, id: id } : { name: teacherName };
+    const res = id ? await axiosPut('./api/teacher/', newTeach) : await axiosPost(`./api/teacher`, newTeach);
+
+    console.log(res);
+
+    if (res.status === 200) {
+      alert('Teacher Created, ID: ' + res.data._id);
+      window.location.assign(`${window.location.origin}/teachers`);
+    } else {
+      alert("Failed to create " + teacherName);
+    }
+  } catch (e) {
+    console.error(e);
+    alert("An error occurred");
+  }
+});
+
 </script>
 </html>

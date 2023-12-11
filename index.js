@@ -67,18 +67,18 @@ const userSchema = mongoose.Schema({
     username: String,
     password: String,
     courses: [String], // Assuming course IDs are stored here
-  });
+  },{versionKey:false});
   
   const teacherSchema = mongoose.Schema({
     id: mongoose.Schema.Types.ObjectId,
-    username: String,
-  });
+    name: String,
+},{versionKey:false});
   
   const courseSchema = mongoose.Schema({
     id: mongoose.Schema.Types.ObjectId,
     name: String,
     teacher: { type: mongoose.Schema.Types.ObjectId, ref: 'Teacher' },
-  });
+},{versionKey:false});
 
 const User = mongoose.model('User', userSchema);
 const Teacher = mongoose.model('Teacher', teacherSchema);
@@ -168,6 +168,7 @@ app.post('/api/createCourse', async (req, res) => {
     app.get('/api/teachers', async (req, res) => {
         try {
             const teachers = await Teacher.find();
+            console.log(teachers);
             res.json(teachers);
         } catch (error) {
             res.status(500).json({ error: 'Internal Server Error' });
@@ -191,26 +192,24 @@ app.get('/api/teachers/:id', async (req, res) => {
 });
 app.post('/api/teacher', async (req, res) => {
     try {
-
-        const teacherData = req.body;
+        const teacherData = req.body; // Access the request body directly
         const teacher = new Teacher(teacherData);
-        
-        if (!teacher._id) {
-            teacher._id = new mongoose.Types.ObjectId();
-        }
-
+        console.log(teacher);
         const savedTeacher = await teacher.save();
         res.json(savedTeacher);
     } catch (error) {
+        console.error(error);
         res.status(500).json({ error: 'Internal Server Error' });
     }
 });
 
 
-app.put('/api/teacher/:id', async (req, res) => {
+
+app.put('/api/teacher', async (req, res) => {
     try {
         const updatedTeacherData = req.body;
-        const teacherId = req.params.id;
+        console.log(updatedTeacherData);
+        const teacherId = updatedTeacherData.id;
 
         const existingTeacher = await Teacher.findById(teacherId);
 
@@ -218,7 +217,7 @@ app.put('/api/teacher/:id', async (req, res) => {
             return res.status(404).json({ error: 'Teacher not found' });
         }
 
-        existingTeacher.username = updatedTeacherData.username;
+        existingTeacher.name = updatedTeacherData.name;
         const updatedTeacher = await existingTeacher.save();
 
         res.json(updatedTeacher);
@@ -228,8 +227,10 @@ app.put('/api/teacher/:id', async (req, res) => {
 });
 
 app.delete('/api/teacher/:id', async (req, res) => {
+    console.log("HIT");
     try {
-        const teacherId = req.params.id;
+        const teacherId = JSON.parse(req.params.id); // Use req.params.id for route parameters
+        console.log(teacherId);
 
         const deletedTeacher = await Teacher.findByIdAndDelete(teacherId);
 
@@ -239,9 +240,12 @@ app.delete('/api/teacher/:id', async (req, res) => {
 
         res.json({ message: 'Teacher deleted successfully' });
     } catch (error) {
+        console.error(error);
         res.status(500).json({ error: 'Internal Server Error' });
     }
 });
+
+
 
 
 
@@ -271,54 +275,68 @@ app.get('/api/course/:id', async (req, res) => {
 });
 
 app.post('/api/course', async (req, res) => {
+    l("HIT");
+    l(req.body);
     try {
-        const courseData = req.body;
-        const teacherId = courseData.teacher;
-        const teacher = await Teacher.findById(teacherId);
-
-        if (!teacher) {
-            return res.status(404).json({ error: 'Teacher not found' });
-        }
-
-        const course = new Course({
-            name: courseData.name,
-            teacher: teacher._id,
-        });
-
-        const newCourse = await course.save();
-        res.json({ id: newCourse._id });
+      const courseData = req.body;
+      l(courseData);
+  
+      const teacherId = courseData.teacher;
+      const teacher = await Teacher.findById(teacherId);
+  
+      if (!teacher) {
+        return res.status(404).json({ error: 'Teacher not found' });
+      }
+  
+      const course = new Course({
+        name: courseData.name,
+        teacher: teacher._id,
+      });
+  
+      const newCourse = await course.save();
+      res.json({ id: newCourse._id });
     } catch (error) {
-        res.status(500).json({ error: 'Internal Server Error' });
+      res.status(500).json({ error });
     }
-});
+  });
+  
+  
 
-app.put('/api/course/:id', async (req, res) => {
+  app.put('/api/course', async (req, res) => {
     try {
-        const courseId = req.params.id;
-        const updatedCourseData = req.body;
-        const updatedCourse = await Course.findByIdAndUpdate(courseId, updatedCourseData, { new: true });
-
-        if (!updatedCourse) {
-            return res.status(404).json({ error: 'Course not found' });
-        }
-
-        res.json(updatedCourse);
+      const course = req.body;
+      console.log(course); // Log the received data
+      const courseToUpdate = await Course.findByIdAndUpdate(req.body._id, req.body, { new: true });
+  
+      if (!courseToUpdate) {
+        return res.status(404).json({ error: 'Course not found' });
+      }
+  
+      res.json(courseToUpdate);
     } catch (error) {
-        res.status(500).json({ error: 'Internal Server Error' });
+      console.error(error);
+      res.status(500).json({ error });
     }
-});
+  });
+  
+  
+
 
 app.delete('/api/course/:id', async (req, res) => {
+    console.log("HIT");
     try {
-        const courseId = req.params.id;
-        const deletedCourse = await Course.findByIdAndDelete(courseId);
+        const courseId = JSON.parse(req.params.id); // Use req.params.id for route parameters
+        console.log(courseId);
 
-        if (!deletedCourse) {
-            return res.status(404).json({ error: 'Course not found' });
+        const deletedcourse = await Course.findByIdAndDelete(courseId);
+
+        if (!deletedcourse) {
+            return res.status(404).json({ error: 'course not found' });
         }
 
-        res.json({ message: 'Course deleted successfully' });
+        res.json({ message: 'course deleted successfully' });
     } catch (error) {
+        console.error(error);
         res.status(500).json({ error: 'Internal Server Error' });
     }
 });
