@@ -27,47 +27,68 @@
     
 
     <script>
-         setAuth();
+        axios.defaults.headers.common['Authorization'] = localStorage.getItem('authentication');
+
     const signinForm = document.getElementById('signin-form');
     const btnSignIn = document.querySelector('#btnSignin');
     const btnCreate = document.querySelector('#btnCreate');
     const inputs = signinForm.querySelectorAll('input');
+    const inpUserName = inputs[0];
+    const inpPassword = inputs[1];
     
     inputs[0].focus();
-    
-    inputs.forEach((input, index) => {
-        input.addEventListener('keydown', (event) => {
-            if (['Enter', 'ArrowDown'].includes(event.key)) {
-                event.preventDefault();
-                if (index < inputs.length - 1) {
-                    inputs[index + 1].focus();
+
+
+
+
+
+
+    const easeFunctionality = () => {
+        inputs.forEach((input, index) => {
+            input.addEventListener('keydown', (event) => {
+                if (['Enter', 'ArrowDown'].includes(event.key)) {
+                    event.preventDefault();
+                    if (index < inputs.length - 1) {
+                        inputs[index + 1].focus();
+                    }
+                } else if (event.key === 'ArrowUp') {
+                    if (index > 0) {
+                        inputs[index - 1].focus();
+                    }
                 }
-            } else if (event.key === 'ArrowUp') {
-                if (index > 0) {
-                    inputs[index - 1].focus();
-                }
-            }
+            });
         });
-    });
+    }
 
-    btnSignIn.addEventListener('click', async () => {
-        try {
-            const user = {
-                username: document.querySelector('#username').value,
-                password: document.querySelector('#password').value
-            };
-
-            // Make a POST request instead of GET
-            const res = await axios.post('../api/sign-in', user);
-            console.log(res.data);
-        } catch (error) {
-            console.error('Error:', error);
-        }
-    });
+    easeFunctionality();
+    
+    
 
     btnCreate.addEventListener('click', () => {
         window.location.assign(`${window.location.origin}/createAccount`);
     });
+
+    btnSignIn.addEventListener('click', async () => {
+        const obj = {
+            username: inpUserName.value,
+            password: inpPassword.value
+        };
+    
+        try {
+            axios.defaults.headers.common['Authorization'] = localStorage.getItem('authentication');
+            const response = await axios.post('./api/signin', obj);
+            const data = response.data;
+    
+            localStorage.setItem('authentication', JSON.stringify(data));
+    
+            console.log(data);
+        } catch (error) {
+            console.log(error);
+            alert('Username or password incorrect');
+        }
+    });
+    
+
     </script>
 </body>
 </html>

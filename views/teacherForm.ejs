@@ -21,6 +21,8 @@
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 
 <script>
+  axios.defaults.headers.common['Authorization'] = localStorage.getItem('authentication');
+
   const input = document.querySelector('input');
   const btn = document.querySelector('button');
   const h2 = document.querySelector('h2');

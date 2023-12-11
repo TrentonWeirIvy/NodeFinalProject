@@ -45,6 +45,7 @@
 
 
         <script>
+          axios.defaults.headers.common['Authorization'] = localStorage.getItem('authentication');
 
           const inputCourseName = document.querySelector('#courseName');
           const select = document.querySelector('select');

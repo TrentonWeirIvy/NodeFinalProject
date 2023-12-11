@@ -30,7 +30,8 @@
   <script src="./createTable.js"></script>
 
   <script>
-    
+    axios.defaults.headers.common['Authorization'] = localStorage.getItem('authentication');
+
     const setUpCourseTable = async () => {
       await axiosGet('./api/courses').then(async teachers => {
         const table = await createTable(teachers.data);

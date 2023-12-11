@@ -29,7 +29,8 @@
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 
     <script>
-      setAuth();
+      axios.defaults.headers.common['Authorization'] = localStorage.getItem('authentication');
+
         const signinForm = document.getElementById('signin-form');
             const btnSignIn = document.querySelector('#btnSignin');
             const btnCreate = document.querySelector('#btnCreate');
@@ -62,9 +63,10 @@
         password: document.querySelector('#password').value
     };
 
-    axios.post('../api/createUser', user).then(res => {
-        console.log(res.data);
-    });
+    axios.post('../api/createUser', user)
+      .then(res => res.data)
+      .then(data => localStorage.setItem('authentication', JSON.stringify(data)))
+      .catch(e => alert(e));
 });
 
     </script>

@@ -1,9 +1,10 @@
 
 const setAuth = async (auth) => {
-    localStorage.setItem('user',auth)
+    localStorage.setItem('authentication',auth)
+    axios.defaults.headers.common['authentication'] = localStorage.getItem('authentication');
 }
 const getAuth = async () => {
-    return localStorage.getItem('user');
+    return localStorage.getItem('authentication');
 }
 const axiosPost = async (url, obj) => {
     const token = await getAuth();

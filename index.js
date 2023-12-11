@@ -12,7 +12,7 @@ app.set('view engine', 'ejs');// Register view engine
 app.use(express.static('public'));// Middleware & static files
 app.use(cors());
 app.use(bodyParser.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(bodyParser.urlencoded({ extended: true }));
 app.use(morgan('dev'));
 app.use((req, res, next) => {
     res.locals.path = req.path;
@@ -27,24 +27,14 @@ const serial = process.env.JWT_SERIALIZE;
 
 const l = str => console.log(str);
 const checkAuth = async (req, res, next) => {
-    return;
-    const token = req.header('Authorization');
-    const userId = jwt.decode(token, serial);
-    
-    try {
-        const user = await User.findById(userId);
-
-        if (!user) {
-            res.render('signin', { title: 'Sign In' });
-            return; // Return to stop further execution
-        }
-
-        // Attach the user to the request for later use
-        req.user = user;
-        next(); // Call next to move to the next middleware or route handler
-    } catch (error) {
-        res.status(500).json({ error: 'Internal Server Error' });
+    //return;
+    const token = req.headers['authentication'];
+    const obj = jwt.decode(token, serial);
+    const time = new Date(obj?.date);
+    if(await User.exists({_id: obj?.userId})){
+        return (time > new Date())
     }
+    return false;
 };
 
 
@@ -91,34 +81,43 @@ const Course = mongoose.model('Course', courseSchema);
     ///- api
     // API Endpoints
     app.post('/api/createUser', async (req, res) => {
-        await checkAuth(req,res);
         try {
             const userData = req.body;
             const user = new User(userData);
             const newUser = await user.save();
-            res.json({ id: newUser._id });
+            var date = new Date();
+                date.setMinutes(date.getMinutes() + 10);
+                const token = jwt.sign({ userId: newUser._id, date: date  }, process.env.JWT_SECRET);
+                res.json({ token });
         } catch (error) {
             res.status(500).json({ error: 'Internal Server Error' });
         }
     });
-    
 
-app.post('/api/sign-in', async (req, res) => {
-    await checkAuth(req,res);
-    try {
-        const { username, password } = req.body;
-        const existingUser = await User.findOne({ username, password });
 
-        if (existingUser) {
-            const token = jwt.sign({ userId: existingUser._id }, process.env.JWT_SECRET);
-            res.json({ token });
-        } else {
-            res.status(401).json({ error: 'Invalid credentials' });
+    app.post('/api/signin', async (req, res) => {
+        if(await checkAuth(req,res)){
+            res.redirect('/index');
+            return;
         }
-    } catch (error) {
-        res.status(500).json({ error: 'Internal Server Error' });
-    }
-});
+
+        try {
+            console.log(req.body);
+            const {username,password} = req.body;
+            const existingUser = await User.findOne({ username, password });
+
+            if (existingUser) {
+                var date = new Date();
+                date.setMinutes(date.getMinutes() + 10);
+                const token = jwt.sign({ userId: existingUser._id, date: date  }, process.env.JWT_SECRET);
+                res.json({ token });
+            } else {
+                res.status(401).json({ error: 'Invalid credentials' });
+            }
+        } catch (error) {
+            res.status(500).json({ error:error });
+        }
+    });
 
 app.get('/api/users', async (req, res) => {
     try {
@@ -370,7 +369,10 @@ app.get('/index', async (req, res) => {
 ///////**** SIGNIN Form */
 app.get('/signin', async (req, res) => {
     await checkAuth(req,res);
-    res.redirect('/index');
+    res.render('signin', {
+        title:'Sign In'
+    })
+    //res.redirect('/index');
 });
 app.get('/createAccount', async (req, res) => {
     res.render('createAccount', {title:"Create New Account"});
