@@ -22,7 +22,7 @@
     }
     const setUpTable = async () => {
       await axiosGet('./api/teachers').then(async teachers => {
-        const table = await createTable(teachers.data);
+        const table = await createTable(teachers.data,true);
         const container = document.querySelector('.container');
         container.append(table);
         teacherAddButtons(table);

@@ -33,8 +33,8 @@
     axios.defaults.headers.common['Authorization'] = localStorage.getItem('authentication');
 
     const setUpCourseTable = async () => {
-      await axiosGet('./api/courses').then(async teachers => {
-        const table = await createTable(teachers.data);
+      await axiosGet('./api/courses').then(async courses => {
+        const table = await createTable(courses.data,true);
         const container = document.querySelector('.courses');
         table.querySelectorAll('tr').forEach(async row => {
           const id = row.dataset.id;
@@ -51,7 +51,7 @@
     
     const setUpTeacherTable = async () => {
       await axiosGet('./api/teachers').then(async teachers => {
-        const table = await createTable(teachers.data);
+        const table = await createTable(teachers.data,true);
         const container = document.querySelector('.teachers');
         table.querySelectorAll('tr').forEach(async row => {
           const id = row.dataset.id;

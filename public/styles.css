@@ -201,6 +201,9 @@ a:hover {
   width: 100%;
   overflow-x: auto;
 }
+th{
+  text-transform:uppercase;
+}
 
 .mui-table {
   width: 100%;
