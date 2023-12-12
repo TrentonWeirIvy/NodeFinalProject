@@ -27,7 +27,6 @@
     
 
     <script>
-        axios.defaults.headers.common['Authorization'] = localStorage.getItem('authentication');
 
     const signinForm = document.getElementById('signin-form');
     const btnSignIn = document.querySelector('#btnSignin');
@@ -75,13 +74,15 @@
         };
     
         try {
-            axios.defaults.headers.common['Authorization'] = localStorage.getItem('authentication');
+            axios.defaults.headers.common['Authorization'] = localStorage.getItem(AUTH_HEADER);
             const response = await axios.post('./api/signin', obj);
             const data = response.data;
     
-            localStorage.setItem('authentication', JSON.stringify(data));
+            localStorage.setItem(AUTH_HEADER, JSON.stringify(data));
     
             console.log(data);
+            alert('Successfully logged in!');
+            location.assign(`${window.location.origin}/index`);
         } catch (error) {
             console.log(error);
             alert('Username or password incorrect');

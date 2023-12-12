@@ -1,17 +1,48 @@
 <nav class="navbar">
-    <div class="site-title">
-      <a href="/"><h1>PIDGEON FINAL PROJECT</h1></a>
-      <p>SDEV255</p>
+  <header>
+    <a href="/"><h1>PIDGEON FINAL PROJECT</h1></a>
+    <p>SDEV255</p>
+  </header>
+  <div class="links-content">
+    <div id="navContent">
+      <details>
+        <summary>Menu</summary>
+        <ul class="nav-links">
+          <li><a href="/index">Home</a></li>
+          <li><a href="/teachers">Teachers</a></li>
+          <li><a href="/courses">Courses</a></li>
+          <li><a href="/teacherForm">Create Teacher</a></li>
+          <li><a href="/courseForm">Create Course</a></li>
+        </ul>
+      </details>
     </div>
-    <ul class="nav-links">
-      <li><a href="/index">Home</a></li>
-      <!-- Add links for the new pages -->
-      <li><a href="/teachers">Teachers</a></li>
-      <li><a href="/courses">Courses</a></li>
-      <li><a href="/teacherForm">Create Teacher</a></li>
-      <li><a href="/courseForm">Create Course</a></li>
-      <li><a href="/signin">Sign In</a></li>
-      <li><a href="/createAccount">Create Account</a></li>
-    </ul>
-  </nav>
-  
+    <div class="nav-links" id="login">
+      <li id="signin"><a href="/signin">Sign In</a></li>
+      <li id="signout" hidden><a>Sign Out</a></li>
+    </div>
+  </div>
+</nav>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const signin = document.querySelector('#signin');
+    const signout = document.querySelector('#signout');
+
+    const auth = localStorage.getItem(AUTH_HEADER);
+
+    // Ensure the 'Authorization' header is set correctly
+    axios.defaults.headers.common[AUTH_HEADER] = auth ? `Bearer ${JSON.parse(auth).token}` : '';
+
+
+    // Using classList to toggle classes
+    signin.hidden = !!auth;
+    signout.hidden = !auth;
+
+    signout.querySelector('a').addEventListener('click', () => {
+        localStorage.clear();
+        axios.defaults.headers.common[AUTH_HEADER] = '';
+        window.location.reload();
+    });
+});
+
+</script>

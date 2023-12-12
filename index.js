@@ -18,20 +18,24 @@ app.use((req, res, next) => {
   res.locals.path = req.path;
   next();
 });
+app.use((req, res, next) => {
+  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
+  next();
+});
 
 const port = process.env.PORT;
 const dbURI = process.env.MONGO_CONECTION;
-const serial = process.env.JWT_SERIALIZE;
+const serial = process.env.JWT_SECTRET;
 
 const l = (str) => console.log(str);
 const checkAuth = async (req) => {
-  //return;
-  const token = req.headers["authentication"];
+  return true;
+  const token = req.headers["Authorization"];
   const obj = jwt.decode(token, serial);
+  if(obj == undefined) return false;
   const time = new Date(obj?.date);
-  const isGood = (await User.exists({ _id: obj?.userId })) && time > new Date();
-  console.log(isGood);
-  return isGood;
+  const isValid = (await User.exists({ _id: obj?.userId })) != null && time > new Date();
+  return isValid;
 };
 
 if (dbURI) {
@@ -48,7 +52,7 @@ const userSchema = mongoose.Schema(
     id: mongoose.Schema.Types.ObjectId,
     username: String,
     password: String,
-    courses: [String], // Assuming course IDs are stored here
+    courses: [Object], // Assuming course IDs are stored here
   },
   { versionKey: false },
 );
@@ -74,6 +78,7 @@ const User = mongoose.model("User", userSchema);
 const Teacher = mongoose.model("Teacher", teacherSchema);
 const Course = mongoose.model("Course", courseSchema);
 
+
 ///- api
 // API Endpoints
 app.post("/api/createUser", async (req, res) => {
@@ -84,7 +89,7 @@ app.post("/api/createUser", async (req, res) => {
     var date = new Date();
     date.setMinutes(date.getMinutes() + 10);
     const token = jwt.sign(
-      { userId: newUser._id, date: date },
+      {userId:newUser._id},
       process.env.JWT_SECRET,
     );
     res.json({ token });
@@ -94,11 +99,6 @@ app.post("/api/createUser", async (req, res) => {
 });
 
 app.post("/api/signin", async (req, res) => {
-  if (await checkAuth(req)) {
-    res.redirect("/index");
-    return;
-  }
-
   try {
     const { username, password } = req.body;
     const existingUser = await User.findOne({ username, password });
@@ -106,7 +106,7 @@ app.post("/api/signin", async (req, res) => {
       var date = new Date();
       date.setMinutes(date.getMinutes() + 10);
       const token = jwt.sign(
-        { userId: existingUser._id, date: date },
+        {userId:existingUser._id},
         process.env.JWT_SECRET,
       );
       l(token);
@@ -115,11 +115,16 @@ app.post("/api/signin", async (req, res) => {
       res.status(401).json({ error: "Invalid credentials" });
     }
   } catch (error) {
+    console.log(error)
     res.status(500).json({ error: error });
   }
 });
 
 app.get("/api/users", async (req, res) => {
+  if (!await checkAuth(req)) {
+    res.redirect("/signin");
+    return;
+  }
   try {
     const users = await User.find();
     res.json(users);
@@ -128,10 +133,18 @@ app.get("/api/users", async (req, res) => {
   }
 });
 
-app.get("/api/users/:id", async (req, res) => {
+app.get("/api/getUserById", async (req, res) => {
   try {
-    const userId = req.params.id;
-    const user = await User.findById(userId);
+    const body = req.query.user // Extract user ID from query parameters
+    const data = jwt.decode(body, process.env.JWT_SECRET)
+    const userId = data.userId;
+
+    const userData = await User.findById(userId);
+    const user = {
+      _id: userData._id,
+      username: userData.username,
+      courses: userData.courses ?? []
+    }
 
     if (user) {
       res.json(user);
@@ -142,8 +155,31 @@ app.get("/api/users/:id", async (req, res) => {
     res.status(500).json({ error: "Internal Server Error" });
   }
 });
+app.post("/api/signUpForCourse", async (req, res) => {
+  try {
+    const user = req.body
+    console.log(user);
+
+    const userData = await User.findOneAndUpdate(user._id, user.courses);
+    
+
+    if (userData) {
+      res.json(userData);
+    } else {
+      res.status(404).json({ error: "User not found" });
+    }
+  } catch (error) {
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
+
 
 app.post("/api/createCourse", async (req, res) => {
+  if (!await checkAuth(req)) {
+    res.redirect("/signin");
+    return;
+  }
   try {
     const courseData = req.body;
     const teacher = await Teacher.findOne({
@@ -167,20 +203,25 @@ app.post("/api/createCourse", async (req, res) => {
 });
 
 app.get("/api/teachers", async (req, res) => {
+  if (!await checkAuth(req)) {
+    res.redirect("/signin");
+    return;
+  }
   try {
     const teachers = await Teacher.find();
-    console.log(teachers);
     res.json(teachers);
   } catch (error) {
     res.status(500).json({ error: "Internal Server Error" });
   }
 });
 app.get("/api/teachers/:id", async (req, res) => {
+  if (!await checkAuth(req)) {
+    res.redirect("/signin");
+    return;
+  }
   try {
     const teacherId = JSON.parse(req.params.id);
-    console.log(teacherId);
     const teacher = await Teacher.findById(teacherId);
-    console.log(teacher);
 
     if (teacher) {
       res.json(teacher);
@@ -192,10 +233,13 @@ app.get("/api/teachers/:id", async (req, res) => {
   }
 });
 app.post("/api/teacher", async (req, res) => {
+  if (!await checkAuth(req)) {
+    res.redirect("/signin");
+    return;
+  }
   try {
     const teacherData = req.body; // Access the request body directly
     const teacher = new Teacher(teacherData);
-    console.log(teacher);
     const savedTeacher = await teacher.save();
     res.json(savedTeacher);
   } catch (error) {
@@ -205,9 +249,12 @@ app.post("/api/teacher", async (req, res) => {
 });
 
 app.put("/api/teacher", async (req, res) => {
+  if (!await checkAuth(req)) {
+    res.redirect("/signin");
+    return;
+  }
   try {
     const updatedTeacherData = req.body;
-    console.log(updatedTeacherData);
     const teacherId = updatedTeacherData.id;
 
     const existingTeacher = await Teacher.findById(teacherId);
@@ -226,10 +273,12 @@ app.put("/api/teacher", async (req, res) => {
 });
 
 app.delete("/api/teacher/:id", async (req, res) => {
-  console.log("HIT");
+  if (!await checkAuth(req)) {
+    res.redirect("/signin");
+    return;
+  }
   try {
     const teacherId = JSON.parse(req.params.id); // Use req.params.id for route parameters
-    console.log(teacherId);
 
     const deletedTeacher = await Teacher.findByIdAndDelete(teacherId);
 
@@ -245,6 +294,10 @@ app.delete("/api/teacher/:id", async (req, res) => {
 });
 
 app.get("/api/courses", async (req, res) => {
+  if (!await checkAuth(req)) {
+    res.redirect("/signin");
+    return;
+  }
   try {
     const courses = await Course.find();
     res.json(courses);
@@ -254,6 +307,10 @@ app.get("/api/courses", async (req, res) => {
 });
 
 app.get("/api/course/:id", async (req, res) => {
+  if (!await checkAuth(req)) {
+    res.redirect("/signin");
+    return;
+  }
   try {
     const courseId = JSON.parse(req.params.id);
 
@@ -270,12 +327,12 @@ app.get("/api/course/:id", async (req, res) => {
 });
 
 app.post("/api/course", async (req, res) => {
-  l("HIT");
-  l(req.body);
+  if (!await checkAuth(req)) {
+    res.redirect("/signin");
+    return;
+  }
   try {
     const courseData = req.body;
-    l(courseData);
-
     const teacherId = courseData.teacher;
     const teacher = await Teacher.findById(teacherId);
 
@@ -296,9 +353,12 @@ app.post("/api/course", async (req, res) => {
 });
 
 app.put("/api/course", async (req, res) => {
+  if (!await checkAuth(req)) {
+    res.redirect("/signin");
+    return;
+  }
   try {
     const course = req.body;
-    console.log(course); // Log the received data
     const courseToUpdate = await Course.findByIdAndUpdate(
       req.body._id,
       req.body,
@@ -317,10 +377,12 @@ app.put("/api/course", async (req, res) => {
 });
 
 app.delete("/api/course/:id", async (req, res) => {
-  console.log("HIT");
+  if (!await checkAuth(req)) {
+    res.redirect("/signin");
+    return;
+  }
   try {
     const courseId = JSON.parse(req.params.id); // Use req.params.id for route parameters
-    console.log(courseId);
 
     const deletedcourse = await Course.findByIdAndDelete(courseId);
 
@@ -343,10 +405,8 @@ app.get("/", async (req, res) => {
 });
 
 app.get("/index", async (req, res) => {
-  await checkAuth(req);
   const courses = await Course.find();
   const teachers = await Teacher.find();
-  l(teachers);
   res.render("index", { title: "Index", teachers: teachers, courses: courses });
 });
 
@@ -355,11 +415,6 @@ app.get("/index", async (req, res) => {
 ///////**** FORMS */
 ///////**** SIGNIN Form */
 app.get("/signin", async (req, res) => {
-  l("HIT");
-  if (await checkAuth(req)) {
-    res.redirect("/index");
-    return;
-  }
   res.render("signin", {
     title: "Sign In",
   });
@@ -372,7 +427,10 @@ app.get("/createAccount", async (req, res) => {
 ///////**** Teacher Form */
 
 app.get("/teacherForm", async (req, res) => {
-  await checkAuth(req);
+  if (!await checkAuth(req)) {
+    res.redirect("/signin");
+    return;
+  }
   res.render("teacherForm", {
     pageTitle: "Create Teacher",
     title: "Teachers",
@@ -386,7 +444,10 @@ app.get("/teacherForm", async (req, res) => {
 
 ///////**** COURSE FORM */
 app.get("/courseForm", async (req, res) => {
-  await checkAuth(req);
+  if (!await checkAuth(req)) {
+    res.redirect("/signin");
+    return;
+  };
   const courses = await Course.find();
   const teachers = await Teacher.find();
 
@@ -412,12 +473,18 @@ app.get("/courseForm", async (req, res) => {
 
 ///////**** Tables */
 app.get("/teachers", async (req, res) => {
-  await checkAuth(req);
+  if (!await checkAuth(req)) {
+    res.redirect("/signin");
+    return;
+  };
   res.render("teachers", { title: "Teachers" });
 });
 
 app.get("/courses", async (req, res) => {
-  await checkAuth(req);
+  if (!await checkAuth(req)) {
+    res.redirect("/signin");
+    return;
+  };
   res.render("courses", { title: "Courses" });
 });
 

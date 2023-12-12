@@ -30,10 +30,10 @@
   <script src="./createTable.js"></script>
 
   <script>
-    axios.defaults.headers.common['Authorization'] = localStorage.getItem('authentication');
+
 
     const setUpCourseTable = async () => {
-      await axiosGet('./api/courses').then(async courses => {
+      await axios.get('./api/courses').then(async courses => {
         const table = await createTable(courses.data,true);
         const container = document.querySelector('.courses');
         table.querySelectorAll('tr').forEach(async row => {
@@ -48,22 +48,19 @@
     }
     setUpCourseTable();
 
+    const setUpUsersCourses = async () => {
+      const userToken = JSON.parse(localStorage.getItem('User')).token;
+      console.log(userToken);
     
-    const setUpTeacherTable = async () => {
-      await axiosGet('./api/teachers').then(async teachers => {
-        const table = await createTable(teachers.data,true);
-        const container = document.querySelector('.teachers');
-        table.querySelectorAll('tr').forEach(async row => {
-          const id = row.dataset.id;
-          row.addEventListener('click', () => {
-            window.location.assign(window.location.origin + '/teacherForm/' + id);
-          });
-        });
-        container.append(table);
-      })
-      .catch(e => console.error(e));
-    }
-    setUpTeacherTable();
+      await axios.get('./api/getUserById', { params: { user: userToken } })
+        .then(res => res.data)
+        .then(data => console.log(data))
+        .catch(e => console.error(e));
+    };
+    
+  
+  setUpUsersCourses();
+    
   </script>
 </body>
 </html>

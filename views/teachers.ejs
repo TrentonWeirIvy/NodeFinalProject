@@ -14,9 +14,6 @@
   <script src="./createTable.js"></script>
 
   <script>
-    axios.defaults.headers.common['Authorization'] = localStorage.getItem('authentication');
-
-
     const setCookie = (id) => {
       sessionStorage.setItem('teacherId', id)
     }

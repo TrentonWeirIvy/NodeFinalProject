@@ -7,15 +7,23 @@
   --button-color: #3700b3;
   --border-color: #555;
   --hover-color: #555;
-  --table-background-color:#121212;
+  --table-background-color: #121212;
   --th-background: #563761;
   --tr-odd: #2a2a2a;
   --tr-even: #828282;
   --tr-hover-color: #e0e0e0;
   --tr-hover-background-color: rgb(100, 20, 114);
+  --details-background: #444;
+  --details-border: #555;
 }
 
-body, h1, h2, h3, p, ul, li {
+body,
+h1,
+h2,
+h3,
+p,
+ul,
+li {
   margin: 0;
   padding: 0;
 }
@@ -47,24 +55,71 @@ body {
 .nav-links {
   list-style: none;
   display: flex;
+  margin-right: 20px; /* Adjust as needed */
 }
 
 .nav-links li {
-  margin-right: 20px;
+  margin-right: 10px; /* Adjust as needed */
 }
 
 .nav-links a {
   text-decoration: none;
   color: var(--secondary-color);
-  padding: 10px 15px; /* Add padding to create a button-like appearance */
-  border: 1px solid var(--secondary-color); /* Add a border for a button-like look */
-  border-radius: 5px; /* Optional: Add border-radius for rounded corners */
+  padding: 10px 15px;
+  /* border: 1px solid var(--secondary-color); */
+  border-radius: 5px;
   transition: color 0.3s ease-in-out, background-color 0.3s ease-in-out, border-color 0.3s ease-in-out;
 }
 
 .nav-links a:hover {
   color: var(--primary-color);
   border-color: var(--primary-color);
+  border: 1px solid var(--primary-color);
+}
+.links-content {
+  display: flex;
+  align-items: center; /* Align items vertically in the center */
+}
+
+
+#login {
+  display: flex;
+  align-items: center; /* Align items vertically in the center */
+}
+
+#login li {
+  margin-right: 10px; /* Adjust as needed */
+}
+details {
+  margin: 10px 0;
+  background-color: var(--details-background);
+  border: 1px solid var(--details-border);
+  border-radius: 5px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column; /* Change flex-direction to column */
+}
+
+/* Update the styling for the ul inside details */
+details ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+}
+details ul li {
+  margin: .1em;
+}
+details a {
+  width: 100%; /* Set width to 100% to take up the full width */
+}
+
+summary {
+  padding: 10px;
+  cursor: pointer;
+  outline: none;
+  user-select: none;
 }
 
 
@@ -73,20 +128,21 @@ body {
   margin: 0 auto;
   padding: 20px;
 }
-.container-flex{
+
+.container-flex {
   margin-left: 1em;
   margin-right: 1em;
   display: flex;
-  padding:2em;
+  padding: 2em;
 }
 
-  .item {
-    display: inline-block; 
-  }
+.item {
+  display: inline-block;
+}
 
-
-
-h1, h2, h3 {
+h1,
+h2,
+h3 {
   color: var(--primary-color);
 }
 
@@ -201,8 +257,9 @@ a:hover {
   width: 100%;
   overflow-x: auto;
 }
-th{
-  text-transform:uppercase;
+
+th {
+  text-transform: uppercase;
 }
 
 .mui-table {
@@ -212,9 +269,12 @@ th{
   box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
   background-color: var(--table-background-color);
   color: var(--background-light);
+  border-radius: 10px; /* Adjust the radius to your preference */
+  overflow: hidden; /* Clip the rounded corners */
 }
 
-.mui-table th, .mui-table td {
+.mui-table th,
+.mui-table td {
   padding: 12px 15px;
   text-align: left;
   border-bottom: 1px solid var(--border-color);
@@ -225,17 +285,23 @@ th{
   color: var(--background-light);
 }
 
+.mui-table tbody tr:last-child td {
+  border-bottom: none; /* Remove bottom border for the last row */
+}
+
 .mui-table tbody tr:nth-child(odd) {
   background-color: var(--tr-odd);
 }
+
 .mui-table tbody tr:nth-child(even) {
   background-color: var(--tr-even);
 }
 
 .mui-table tbody tr:hover {
   background-color: var(--tr-hover-background-color);
-  color:var(--tr-hover-color)
+  color: var(--tr-hover-color);
 }
+
 
 footer {
   background-color: #121212;
@@ -252,7 +318,8 @@ footer .container {
 /* ... existing styles ... */
 
 .auth-form {
-  max-width: 400px; /* Adjust the maximum width of the form as needed */
+  max-width: 400px;
+  /* Adjust the maximum width of the form as needed */
   margin: 0 auto;
 }
 
@@ -262,8 +329,10 @@ footer .container {
 }
 
 .auth-form .item {
-  flex: 1; /* Use flex property to distribute space evenly between inputs */
-  margin-right: 10px; /* Add margin between the items */
+  flex: 1;
+  /* Use flex property to distribute space evenly between inputs */
+  margin-right: 10px;
+  /* Add margin between the items */
 }
 
 .auth-form label {
@@ -272,11 +341,11 @@ footer .container {
 }
 
 .auth-form input {
-  width: 100%; /* Make the inputs fill the available width */
+  width: 100%;
+  /* Make the inputs fill the available width */
 }
 
 /* ... existing styles ... */
-
 
 /* Add media queries for responsiveness */
 @media only screen and (max-width: 768px) {
@@ -300,4 +369,44 @@ footer .container {
   }
 }
 
-/* Add more media queries as needed */
+/* Add media queries for responsiveness */
+@media only screen and (max-width: 768px) {
+  /* Navbar adjustments */
+  .navbar {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 10px;
+  }
+
+  .nav-links {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .nav-links li {
+    margin-right: 0;
+    margin-bottom: 10px;
+  }
+
+  /* Container adjustments */
+  .container {
+    padding: 10px;
+  }
+
+  /* Select dropdown adjustments */
+  .select-dropdown {
+    max-height: 200px;
+    /* Adjust max height as needed */
+  }
+
+  /* Auth form adjustments */
+  .auth-form {
+    max-width: 100%;
+    padding: 10px;
+  }
+
+  .auth-form .item {
+    margin-right: 0;
+    margin-bottom: 10px;
+  }
+}
