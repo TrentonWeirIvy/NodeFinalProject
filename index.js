@@ -223,6 +223,36 @@ app.put("/api/signUpForCourse", async (req, res) => {
   }
 });
 
+app.put("/api/RemoveCourseFromUser", async (req, res) => {
+  console.log("HIT")
+  try {
+    const signUp = req.body
+    const userId = jwt.decode(signUp.token, serial).userId;
+    console.log(userId)
+    const courseId = signUp.courseId;
+    const user = await User.findById(userId)
+    const courseIndex = user.courses.indexOf(courseId);
+
+    if (courseIndex !== -1) {
+      // Remove the courseId from the user's courses
+      user.courses.splice(courseIndex, 1);
+    }
+    const userData = user.save();
+    
+
+    if (userData) {
+      res.json(userData);
+    } else {
+      res.status(404).json({ error: "User not found" });
+    }
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
+
+
 
 
 app.post("/api/createCourse", async (req, res) => {

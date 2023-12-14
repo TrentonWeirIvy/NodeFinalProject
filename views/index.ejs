@@ -62,18 +62,16 @@
 
               btn.addEventListener('click', async () => {
                 const sendData = {
-                  token: localStorage.getItem(AUTH_HEADER),
+                  token: JSON.parse(localStorage.getItem(AUTH_HEADER)).token,
                   courseId: row.dataset.id
                 }
-                axios.delete('./api/RemoveCourseFromUser', sendData)
+                await axios.put('./api/RemoveCourseFromUser', sendData)
                 .then(res => res.data)
                 .then(data => console.log(data))
-                .catch(e => console.error(e));
+                .catch(e => console.error(e))
+                .finally(r => window.location.reload());
               })
             });
-
-            
-            
           }
 
           const setUpUsersCourses = async () => {

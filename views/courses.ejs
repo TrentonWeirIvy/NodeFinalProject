@@ -16,9 +16,7 @@
   
   <script>
 
-    const setCookie = (id) => {
-      sessionStorage.setItem('courseId', id)
-    }
+   
 
     const setUpTable = async () => {
       await axiosGet('./api/courses').then(async courses => {
