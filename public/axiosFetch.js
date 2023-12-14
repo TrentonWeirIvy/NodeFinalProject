@@ -32,3 +32,6 @@ const axiosDelete = async (url, data) => {
     setAuthHeader();
     return await axios.delete(url, { data });
 };
+
+
+

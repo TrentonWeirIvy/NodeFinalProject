@@ -5,4 +5,9 @@
     <title>SDEV 255 Final Project | <%= title %></title>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script src="./axiosFetch.js"></script>
+    <script>
+      if (!localStorage.getItem(AUTH_HEADER) && (window.location.pathname !== '/signin' && window.location.pathname !== '/createAccount')) {
+        window.location.assign('./signin');
+      }
+    </script>
   </head>
