@@ -52,7 +52,7 @@ const userSchema = mongoose.Schema(
     id: mongoose.Schema.Types.ObjectId,
     username: String,
     password: String,
-    courses: [{ type: mongoose.Schema.Types.ObjectId, ref: "Course" }],
+    courses: [String],
   },
   { versionKey: false },
 );
@@ -134,6 +134,7 @@ app.get("/api/users", async (req, res) => {
   }
 });
 
+
 app.get("/api/getUserById", async (req, res) => {
   try {
     const body = req.query.user // Extract user ID from query parameters
@@ -156,6 +157,47 @@ app.get("/api/getUserById", async (req, res) => {
     res.status(500).json({ error: "Internal Server Error" });
   }
 });
+
+
+app.get("/api/userCourseInfo", async (req, res) => {
+  if (!await checkAuth(req)) {
+    res.redirect("/signin");
+    return;
+  }
+
+  try {
+    console.log(req.query);
+    const token = req.query.token; // Use req.query for query parameters
+    const userId = jwt.decode(token, serial).userId;
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    // Use Promise.all for parallelizing asynchronous operations
+    const coursesPromises = user.courses.map(async (id) => {
+      const course = await Course.findById(id);
+      course.teacher = await Teacher.findById(course.teacher)
+      return course;
+    });
+
+    const courses = await Promise.all(coursesPromises);
+
+    const displayUser = {
+      username: user.username,
+      courses: courses,
+    };
+
+    res.json(displayUser);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
+
+
 app.put("/api/signUpForCourse", async (req, res) => {
   console.log("HIT")
   try {
@@ -163,11 +205,11 @@ app.put("/api/signUpForCourse", async (req, res) => {
     const userId = jwt.decode(signUp.userId, serial).userId;
     const courseId = signUp.courseId;
     console.log(signUp);
-    const course = await Course.findById(courseId);
     const user = await User.findById(userId)
     console.log(user);
-    user.courses.push(course);
-    const userData = await User.findOneAndUpdate(user._id, user.courses);
+    user.courses.push(courseId);
+    user.courses = Array.from(new Set(user.courses));
+    const userData = user.save();
     
 
     if (userData) {
