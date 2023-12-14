@@ -89,7 +89,7 @@ const courseAddButtons = (table) => {
   const rows = tbody.querySelectorAll("tr");
   for (let row of rows) {
     const td = document.createElement("td");
-    const btns = ["Edit", "Delete"].map((name) => {
+    const btns = ["Edit", "Delete", "Sign Up"].map((name) => {
       const btn = document.createElement("button");
       btn.innerText = name;
       btn.classList = ["button modern-button"];
@@ -113,6 +113,24 @@ const courseAddButtons = (table) => {
       } catch (error) {
         console.error(error);
         alert("An error occurred while deleting course");
+      }
+      location.reload();
+    };
+    btns[2].onclick = async () => {
+      try {
+        const response = await axiosPut(
+          `../api/signUpForCourse`,
+          {courseId: row.dataset.id, userId: JSON.parse(localStorage.getItem("User")).token}
+        );
+        if (response.status === 200) {
+          alert("Course Added");
+          // Add code to update your UI or handle the deletion in the client-side
+        } else {
+          alert("Something went wrong sigining up for this course!");
+        }
+      } catch (error) {
+        console.error(error);
+        alert(error);
       }
       location.reload();
     };

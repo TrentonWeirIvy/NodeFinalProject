@@ -52,10 +52,11 @@ const userSchema = mongoose.Schema(
     id: mongoose.Schema.Types.ObjectId,
     username: String,
     password: String,
-    courses: [Object], // Assuming course IDs are stored here
+    courses: [{ type: mongoose.Schema.Types.ObjectId, ref: "Course" }],
   },
   { versionKey: false },
 );
+
 
 const teacherSchema = mongoose.Schema(
   {
@@ -155,11 +156,17 @@ app.get("/api/getUserById", async (req, res) => {
     res.status(500).json({ error: "Internal Server Error" });
   }
 });
-app.post("/api/signUpForCourse", async (req, res) => {
+app.put("/api/signUpForCourse", async (req, res) => {
+  console.log("HIT")
   try {
-    const user = req.body
+    const signUp = req.body
+    const userId = jwt.decode(signUp.userId, serial).userId;
+    const courseId = signUp.courseId;
+    console.log(signUp);
+    const course = await Course.findById(courseId);
+    const user = await User.findById(userId)
     console.log(user);
-
+    user.courses.push(course);
     const userData = await User.findOneAndUpdate(user._id, user.courses);
     
 
@@ -169,6 +176,7 @@ app.post("/api/signUpForCourse", async (req, res) => {
       res.status(404).json({ error: "User not found" });
     }
   } catch (error) {
+    console.log(error);
     res.status(500).json({ error: "Internal Server Error" });
   }
 });
