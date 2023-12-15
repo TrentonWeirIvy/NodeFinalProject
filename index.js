@@ -85,19 +85,46 @@ const Course = mongoose.model("Course", courseSchema);
 app.post("/api/createUser", async (req, res) => {
   try {
     const userData = req.body;
+    
+    // Validate username and password
+    if (userData.username.trim() === '' || userData.password.trim() === '') {
+      res.status(400).json({ error: "Username and Password cannot be empty" });
+      return;
+    }
+    if (userData.username.trim().length < 4) {
+      res.status(400).json({ error: "Username must be at least 4 characters." });
+      return;
+    }
+    if (userData.password.trim().length < 6) {
+      res.status(400).json({ error: "Password must be at least 6 characters" });
+      return;
+    }
+
+    // Check if username already exists
+    const existingUser = await User.findOne({ username: userData.username });
+
+    if (existingUser) {
+      res.status(400).json({ error: "Username is already taken" });
+      return;
+    }
+
+    // If username is unique, create a new user
     const user = new User(userData);
     const newUser = await user.save();
-    var date = new Date();
-    date.setMinutes(date.getMinutes() + 10);
+
+    // Create a JWT token for the new user
     const token = jwt.sign(
-      {userId:newUser._id},
-      process.env.JWT_SECRET,
+      { userId: newUser._id },
+      process.env.JWT_SECRET
     );
+
     res.json({ token });
   } catch (error) {
+    console.error(error);
     res.status(500).json({ error: "Internal Server Error" });
   }
 });
+
 
 app.post("/api/signin", async (req, res) => {
   try {
@@ -380,6 +407,14 @@ app.get("/api/courses", async (req, res) => {
   }
   try {
     const courses = await Course.find();
+
+    const coursesPromises = courses.map(async (course) => {
+      course.teacher = await Teacher.findById(course.teacher)
+      return course;
+    });
+
+    await Promise.all(coursesPromises);
+
     res.json(courses);
   } catch (error) {
     res.status(500).json({ error: "Internal Server Error" });

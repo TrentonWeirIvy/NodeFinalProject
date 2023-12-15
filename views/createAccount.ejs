@@ -65,7 +65,8 @@
     axios.post('../api/createUser', user)
       .then(res => res.data)
       .then(data => localStorage.setItem(AUTH_HEADER, JSON.stringify(data)))
-      .catch(e => alert(e));
+      .then(data => window.location.assign(`${window.location.origin}/index`))
+      .catch(e => { alert(e.response.data.error);console.log(e.response)});
 });
 
     </script>

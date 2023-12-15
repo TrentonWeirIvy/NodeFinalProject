@@ -20,7 +20,7 @@
 
     const setUpTable = async () => {
       await axiosGet('./api/courses').then(async courses => {
-        const table = await createTable(courses.data,true);
+        const table = await createCourseTable(courses.data,true);
         const container = document.querySelector('.container');
         container.append(table);
         courseAddButtons(table);

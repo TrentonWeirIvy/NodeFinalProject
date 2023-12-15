@@ -37,6 +37,45 @@ const createTable = (data, ignore_Id = false) => {
   return table;
 };
 
+const createCourseTable = (data, ignore_Id = false) => {
+  const keys = Object.keys(data[0]);
+
+  const filteredKeys = ignore_Id ? keys.filter((key) => key !== "_id") : keys;
+
+  const table = document.createElement("table");
+  table.classList = ["mui-table"];
+
+  const thead = table.createTHead();
+  const tbody = table.createTBody();
+
+  const makeHeader = () => {
+    const row = document.createElement("tr");
+    row.classList = ["course-row"];
+    filteredKeys.forEach((key) => {
+      const th = document.createElement("th");
+      th.innerText = key;
+      row.append(th);
+    });
+    thead.append(row);
+  };
+
+  makeHeader();
+
+  data.forEach((d) => {
+    const row = document.createElement("tr");
+    row.dataset.id = d._id;
+    row.classList = ["course-row"];
+    filteredKeys.forEach((key) => {
+      const td = document.createElement("td");
+      td.innerText =(key == 'teacher') ? d[key].name : d[key];
+      row.append(td);
+    });
+    tbody.append(row);
+  });
+
+  return table;
+};
+
 const teacherAddButtons = (table) => {
   const thead = table.querySelector("thead");
   const headerRow = thead.querySelector("tr");

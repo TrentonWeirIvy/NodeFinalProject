@@ -9,5 +9,8 @@
       if (!localStorage.getItem(AUTH_HEADER) && (window.location.pathname !== '/signin' && window.location.pathname !== '/createAccount')) {
         window.location.assign('./signin');
       }
+      if(localStorage.getItem(AUTH_HEADER) && (window.location.pathname == '/signin' || window.location.pathname == '/createAccount')){
+        window.location.assign(`${window.location.origin}/index`)
+      }
     </script>
   </head>
